@@ -1,0 +1,256 @@
+{
+  "id": null,
+  "name": "jubaka",
+  "enabled": true,
+  "coinTradingStates": {
+    "TRXUSDT": {
+      "symbol": "TRXUSDT",
+      "intervalInfos": {
+        "INTERVAL_30m": {
+          "stateType": "SLEEPING",
+          "acquiredQty": 0,
+          "statusTime": 1743563071784,
+          "lastPrice": 0.239,
+          "settings": {
+            "buyAmount": 6,
+            "sellAmount": -1,
+            "tradeOffset": 0.4,
+            "stopLoss": 2,
+            "stopLossTimeout": 360,
+            "rsiHigh": 69,
+            "rsiLow": 31
+          }
+        }
+      }
+    },
+    "BNBUSDT": {
+      "symbol": "BNBUSDT",
+      "intervalInfos": {
+        "INTERVAL_30m": {
+          "stateType": "SLEEPING",
+          "acquiredQty": 0,
+          "statusTime": 1743575261784,
+          "lastPrice": 598.22,
+          "settings": {
+            "buyAmount": 6,
+            "sellAmount": -1,
+            "tradeOffset": 0.4,
+            "stopLoss": 2,
+            "stopLossTimeout": 360,
+            "rsiHigh": 69,
+            "rsiLow": 31
+          }
+        }
+      }
+    },
+    "GRTUSDT": {
+      "symbol": "GRTUSDT",
+      "intervalInfos": {
+        "INTERVAL_30m": {
+          "stateType": "DISABLED",
+          "acquiredQty": 67.95,
+          "statusTime": 1743573307989,
+          "lastPrice": 0.0878,
+          "settings": {
+            "buyAmount": 6,
+            "sellAmount": -1,
+            "tradeOffset": 0.4,
+            "stopLoss": 2,
+            "stopLossTimeout": 360,
+            "rsiHigh": 69,
+            "rsiLow": 31
+          }
+        }
+      }
+    },
+    "SCAUSDT": {
+      "symbol": "SCAUSDT",
+      "intervalInfos": {
+        "INTERVAL_30m": {
+          "stateType": "SLEEPING",
+          "acquiredQty": 0,
+          "statusTime": 1743543781784,
+          "lastPrice": 0.08371,
+          "settings": {
+            "buyAmount": 6,
+            "sellAmount": -1,
+            "tradeOffset": 0.4,
+            "stopLoss": 2,
+            "stopLossTimeout": 360,
+            "rsiHigh": 69,
+            "rsiLow": 31
+          }
+        }
+      }
+    },
+    "TONUSDT": {
+      "symbol": "TONUSDT",
+      "intervalInfos": {
+        "INTERVAL_30m": {
+          "stateType": "SLEEPING",
+          "acquiredQty": 1.51,
+          "statusTime": 1743562451211,
+          "lastPrice": 3.954,
+          "settings": {
+            "buyAmount": 6,
+            "sellAmount": -1,
+            "tradeOffset": 0.4,
+            "stopLoss": 2,
+            "stopLossTimeout": 360,
+            "rsiHigh": 69,
+            "rsiLow": 31
+          }
+        }
+      }
+    },
+    "GALAUSDT": {
+      "symbol": "GALAUSDT",
+      "intervalInfos": {
+        "INTERVAL_30m": {
+          "stateType": "SLEEPING",
+          "acquiredQty": 0,
+          "statusTime": 1743525108672,
+          "lastPrice": 0,
+          "settings": {
+            "buyAmount": 6,
+            "sellAmount": -1,
+            "tradeOffset": 0.4,
+            "stopLoss": 2,
+            "stopLossTimeout": 360,
+            "rsiHigh": 69,
+            "rsiLow": 31
+          }
+        }
+      }
+    },
+    "MNTUSDT": {
+      "symbol": "MNTUSDT",
+      "intervalInfos": {
+        "INTERVAL_30m": {
+          "stateType": "SLEEPING",
+          "acquiredQty": 0,
+          "statusTime": 1743525108672,
+          "lastPrice": 0.7779,
+          "settings": {
+            "buyAmount": 6,
+            "sellAmount": -1,
+            "tradeOffset": 0.4,
+            "stopLoss": 2,
+            "stopLossTimeout": 360,
+            "rsiHigh": 69,
+            "rsiLow": 31
+          }
+        }
+      }
+    },
+    "SQDUSDT": {
+      "symbol": "SQDUSDT",
+      "intervalInfos": {
+        "INTERVAL_30m": {
+          "stateType": "DISABLED",
+          "acquiredQty": 41.2,
+          "statusTime": 1743570162005,
+          "lastPrice": 0.14412,
+          "settings": {
+            "buyAmount": 6,
+            "sellAmount": -1,
+            "tradeOffset": 0.4,
+            "stopLoss": 2,
+            "stopLossTimeout": 360,
+            "rsiHigh": 69,
+            "rsiLow": 31
+          }
+        }
+      }
+    },
+    "OBTUSDT": {
+      "symbol": "OBTUSDT",
+      "intervalInfos": {
+        "INTERVAL_30m": {
+          "stateType": "SLEEPING",
+          "acquiredQty": 492.6,
+          "statusTime": 1743557597208,
+          "lastPrice": 0.0121,
+          "settings": {
+            "buyAmount": 6,
+            "sellAmount": -1,
+            "tradeOffset": 0.4,
+            "stopLoss": 2,
+            "stopLossTimeout": 360,
+            "rsiHigh": 69,
+            "rsiLow": 31
+          }
+        }
+      }
+    }
+  },
+  "coinBalances": {
+    "IOTA": 0,
+    "ROAM": 0,
+    "SLP": 0,
+    "MKR": 0,
+    "MNT": 0,
+    "NOT": 0,
+    "ZRX": 0,
+    "CVC": 0,
+    "USDT": 45.38370318,
+    "VIRTUAL": 0,
+    "OBT": 0.01332,
+    "ELX": 0,
+    "ADA": 0.009832,
+    "UNI": 0,
+    "DRIFT": 0,
+    "ALGO": 0,
+    "BAND": 0,
+    "SOL": 0.0007858,
+    "LTC": 0.73377252,
+    "DASH": 0,
+    "ATOM": 0,
+    "ENJ": 0,
+    "EOS": 0,
+    "VET": 0,
+    "BNB": 0,
+    "LINK": 0,
+    "OXT": 0,
+    "BTC": 5.1e-7,
+    "PEPE": 0,
+    "LRC": 0,
+    "MATIC": 0,
+    "TON": 1.507282,
+    "XTZ": 0,
+    "MANA": 0,
+    "COMP": 0,
+    "UMA": 0,
+    "AAVE": 0,
+    "SHARP": 0,
+    "ETC": 0,
+    "SQD": 41.12584,
+    "TRX": 0,
+    "SCA": 0,
+    "CRV": 0,
+    "SKL": 0,
+    "SAND": 0,
+    "SUSHI": 0,
+    "HBAR": 0,
+    "XRP": 0,
+    "KNC": 0,
+    "XLM": 0,
+    "STORJ": 0,
+    "BAL": 0,
+    "YFI": 0,
+    "TRUMP": 0,
+    "QTUM": 0,
+    "GRT": 67.82769,
+    "OMG": 0,
+    "BNT": 0,
+    "DOGE": 0,
+    "ZEC": 0,
+    "REN": 0,
+    "SNX": 0,
+    "GALA": 0,
+    "NEO": 0,
+    "BCH": 0,
+    "ETH": 0.00000616,
+    "APEX": 0
+  }
+}

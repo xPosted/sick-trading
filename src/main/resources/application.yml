@@ -1,0 +1,7 @@
+sick-trader.config.credentials:
+  bybit:
+    jubaka:
+      key: "bybit-key"
+      secret: "bybit-secret"
+  taapiUrl: "https://api.taapi.io/"
+  taapiSecret: "taapi-secret"

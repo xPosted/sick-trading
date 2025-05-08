@@ -1,0 +1,7 @@
+package com.crypto.sick.trade.dto.enums;
+
+public enum OrderOperationTypeEnum {
+
+    BUY_OPERATION, SELL_OPERATION, STOP_LOSS_OPERATION, SHORT_OPERATION, LONG_OPERATION, SHORT_CLOSE_OPERATION, LONG_CLOSE_OPERATION;
+
+}

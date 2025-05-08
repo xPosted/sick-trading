@@ -1,0 +1,182 @@
+logging:
+  level:
+    ROOT: WARN
+    com.crypto.sick.trade: INFO
+
+server:
+  port : 8081
+
+schedulers:
+  tradeInterval: 2 #seconds
+  rsiLazyUpdateInterval: 45
+  rsiForceUpdateInterval: 4
+  webSocketUpdateInterval: 60
+  walletUpdateInterval: 60
+
+sick-trader.config:
+  amazon.dynamodb:
+    region: "localhost"
+    endpoint: http://localhost:8000/
+  amazon.aws.accesskey: release6
+  amazon.aws.secretkey: release
+  supportedPercentile:
+    - PERCENTILE85
+    - PERCENTILE80
+    - PERCENTILE75
+  supportedIntervals:
+    - INTERVAL_30m
+  disableOnStopLoss: true
+  users:
+    - name: jubaka
+      enabled: true
+      trade:
+        linear:
+          XRPUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE
+              buyAmount: 110 # $
+              leverage: 3
+              stopLoss: 3.5  # %
+              takeProfit: 6 # %
+              flows:
+                MAIN_FLOW: &30M_MAIN_FLOW_TEMPLATE
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.7  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.7
+                      indicatorOffset: 4
+                      stopLossTimeout: 360
+                      highCriticalValue: 80
+                      lowCriticalValue: 20
+                TAKE_PROFIT_FLOW: &30M_TAKE_PROFIT_FLOW_TEMPLATE
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 60
+                      lowCriticalValue: 40
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 68
+                      lowCriticalValue: 42
+          SOLUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE
+          HBARUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE
+          TRXUSDT:
+            INTERVAL_30m:
+              buyAmount: 89 # $
+              leverage: 3
+              stopLoss: 3  # %
+              takeProfit: 6 # %
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.7  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 68.5
+                      lowCriticalValue: 32
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.7
+                      indicatorOffset: 4
+                      stopLossTimeout: 360
+                      highCriticalValue: 76
+                      lowCriticalValue: 24
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 60
+                      lowCriticalValue: 40
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 68
+                      lowCriticalValue: 42
+          BNBUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE
+          SUIUSDT:
+            INTERVAL_30m:
+              buyAmount: 110 # $
+              leverage: 3
+              stopLoss: 3.5  # %
+              takeProfit: 6 # %
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.8  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.8
+                      indicatorOffset: 4
+                      stopLossTimeout: 360
+                      highCriticalValue: 80
+                      lowCriticalValue: 20
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 60
+                      lowCriticalValue: 40
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 68
+                      lowCriticalValue: 42
+          ADAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE
+          DOGEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE
+          AVAXUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE
+          AAVEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE
+          ETHUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE
+          BTCUSDT:
+            INTERVAL_30m:
+              buyAmount: 100 # $
+              leverage: 3
+              stopLoss: 2.5  # %
+              takeProfit: 6 # %
+              flows:
+                MAIN_FLOW: *30M_MAIN_FLOW_TEMPLATE
+                TAKE_PROFIT_FLOW: *30M_TAKE_PROFIT_FLOW_TEMPLATE
+  debug-mode: false

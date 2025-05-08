@@ -1,0 +1,24 @@
+package com.crypto.sick.trade.service.strategy;
+
+import com.crypto.sick.trade.data.user.StrategyState;
+import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
+import com.crypto.sick.trade.dto.enums.Symbol;
+import com.crypto.sick.trade.dto.enums.TaapiIntervalEnum;
+import lombok.Builder;
+import lombok.Value;
+
+import javax.enterprise.inject.spi.Producer;
+import java.util.function.Function;
+
+@Value
+@Builder
+public class StrategyEvaluationParams {
+
+    FlowTypeEnum flowType;
+    StrategyState strategyState;
+    Symbol symbol;
+    TaapiIntervalEnum interval;
+    Function<Double, Boolean> isAvailableToSell;
+    Function<Double, Boolean> isAvailableToBuy;
+
+}
