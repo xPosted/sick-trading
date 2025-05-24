@@ -75,7 +75,19 @@ public enum CoinEnum {
     XDC("XDC"),
     SUI("SUI"),
     AVAX("AVAX"),
-    TRB("TRB");
+    TRB("TRB"),
+    CATI("CATI"),
+    GUN("GUN"),
+    XMR("XMR"),
+    COOKIE("COOKIE"),
+    KAVA("KAVA"),
+    LAUNCHCOIN("LAUNCHCOIN"),
+    AWE("AWE"),
+    ZORA("ZORA"),
+    DARK("DARK"),
+    BANK("BANK"),
+    HAEDAL("HAEDAL"),
+    SYRUP("SYRUP");
 
 
     private final String coin;

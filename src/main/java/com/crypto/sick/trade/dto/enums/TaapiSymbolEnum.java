@@ -36,7 +36,19 @@ public enum TaapiSymbolEnum {
     AVAXUSDT("AVAX/USDT"),
     AAVEUSDT("AAVE/USDT"),
     MKRUSDT("MKR/USDT"),
-    TRBUSDT("TRB/USDT");
+    TRBUSDT("TRB/USDT"),
+    CATIUSDT("CATI/USDT"),
+    GUNUSDT("GUN/USDT"),
+    XMRUSDT("XMR/USDT"),
+    COOKIEUSDT("COOKIE/USDT"),
+    KAVAUSDT("KAVA/USDT"),
+    LAUNCHCOINUSDT("LAUNCHCOIN/USDT"),
+    AWEUSDT("AWE/USDT"),
+    ZORAUSDT("ZORA/USDT"),
+    DARKUSDT("DARK/USDT"),
+    BANKUSDT("BANK/USDT"),
+    HAEDALUSDT("HAEDAL/USDT"),
+    SYRUPUSDT("SYRUP/USDT");
 
 
     private final String value;
@@ -87,6 +99,18 @@ public enum TaapiSymbolEnum {
             case AAVEUSDT -> TaapiSymbolEnum.AAVEUSDT;
             case MKRUSDT -> TaapiSymbolEnum.MKRUSDT;
             case TRBUSDT -> TaapiSymbolEnum.TRBUSDT;
+            case CATIUSDT -> TaapiSymbolEnum.CATIUSDT;
+            case GUNUSDT -> TaapiSymbolEnum.GUNUSDT;
+            case XMRUSDT -> TaapiSymbolEnum.XMRUSDT;
+            case COOKIEUSDT -> TaapiSymbolEnum.COOKIEUSDT;
+            case KAVAUSDT -> TaapiSymbolEnum.KAVAUSDT;
+            case LAUNCHCOINUSDT -> TaapiSymbolEnum.LAUNCHCOINUSDT;
+            case AWEUSDT -> TaapiSymbolEnum.AWEUSDT;
+            case ZORAUSDT -> TaapiSymbolEnum.ZORAUSDT;
+            case DARKUSDT -> TaapiSymbolEnum.DARKUSDT;
+            case BANKUSDT -> TaapiSymbolEnum.BANKUSDT;
+            case HAEDALUSDT -> TaapiSymbolEnum.HAEDALUSDT;
+            case SYRUPUSDT -> TaapiSymbolEnum.SYRUPUSDT;
 
         };
     }

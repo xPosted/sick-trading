@@ -14,6 +14,8 @@ public class StrategyEvaluationResult {
     @With
     TradingStrategyStatusEnum tradingStatus;
     Double lastPrice;
+    Double highCriticalValue;
+    Double lowCriticalValue;
     Long timestamp;
 
 }

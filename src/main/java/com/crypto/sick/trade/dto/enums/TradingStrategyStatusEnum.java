@@ -2,6 +2,7 @@ package com.crypto.sick.trade.dto.enums;
 
 public enum TradingStrategyStatusEnum {
 
+    SETUP(1),
     SLEEPING(1),
     PRE_BUY(2),
     BUY(3),

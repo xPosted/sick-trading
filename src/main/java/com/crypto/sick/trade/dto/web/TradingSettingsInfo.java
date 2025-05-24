@@ -25,7 +25,6 @@ public class TradingSettingsInfo {
         return TradingSettingsInfo.builder()
                 .buyAmount(coinIntervalTradingState.getBuyAmount())
                 .sellAmount(coinIntervalTradingState.getSellAmount())
-                .stopLoss(coinIntervalTradingState.getStopLoss())
                 .stopLossTimeout(coinIntervalTradingState.getStopLossTimeout())
                 .build();
 

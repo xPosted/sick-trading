@@ -16,7 +16,7 @@ public class WalletService {
     private ObjectMapper objectMapper;
 
     public WalletResponse getWallet(CredentialsState credentials) {
-        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret()).newAccountRestClient();
+        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl()).newAccountRestClient();
         var accountRequest = AccountDataRequest.builder().accountType(AccountType.UNIFIED).build();
         var rawResponse = client.getWalletBalance(accountRequest);
         return objectMapper.convertValue(rawResponse, WalletResponse.class);

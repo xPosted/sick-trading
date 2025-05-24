@@ -23,16 +23,23 @@ public class FlowState {
     TradingStrategyStatusEnum status;
     Map<StrategyEnum, StrategyState> strategies;
     boolean syncStrategies;
+    Double stopLoss;
+    Double takeProfit;
 
     public FlowState updateStatus(StrategyEvaluationResult strategyEvaluationResult) {
         var targetStrategyState = strategies.get(strategyEvaluationResult.getStrategy());
         var newStatus = ofNullable(strategyEvaluationResult.getTradingStatus()).orElse(targetStrategyState.getStatus());
         var newTimestamp = ofNullable(strategyEvaluationResult.getTimestamp()).orElse(targetStrategyState.getStatusTime());
         var newPrice = ofNullable(strategyEvaluationResult.getLastPrice()).orElse(targetStrategyState.getLastPrice());
+        var lowCriticalValue = ofNullable(strategyEvaluationResult.getLowCriticalValue()).orElse(targetStrategyState.getLowCriticalValue());
+        var highCriticalValue = ofNullable(strategyEvaluationResult.getHighCriticalValue()).orElse(targetStrategyState.getHighCriticalValue());
+
         var updatedStrategyState = targetStrategyState.toBuilder()
                 .status(newStatus)
                 .statusTime(newTimestamp)
                 .lastPrice(newPrice)
+                .highCriticalValue(highCriticalValue)
+                .lowCriticalValue(lowCriticalValue)
                 .build();
         var updatedStrategyStates = new HashMap<>(strategies);
         updatedStrategyStates.put(strategyEvaluationResult.getStrategy(), updatedStrategyState);

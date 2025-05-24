@@ -44,9 +44,10 @@ public class MarketState {
     public Double getIndicator(TaapiIntervalEnum interval, StrategyEnum strategy) {
         return switch (strategy) {
             case RSI_STRATEGY -> Optional.ofNullable(rsi.get(interval))
-                    .orElseThrow(() -> new IllegalArgumentException("RSI not found for interval: " + interval));
+                    .orElse(-1D);
             case MFI_STRATEGY -> Optional.ofNullable(mfi.get(interval))
-                    .orElseThrow(() -> new IllegalArgumentException("MFI not found for interval: " + interval));
+                    .orElse(-1D);
+            default -> throw new RuntimeException("No any indicator found for strategy: " + strategy);
         };
     }
 

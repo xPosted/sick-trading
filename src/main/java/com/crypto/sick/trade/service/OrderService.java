@@ -2,8 +2,11 @@ package com.crypto.sick.trade.service;
 
 import com.bybit.api.client.domain.CategoryType;
 import com.bybit.api.client.domain.TradeOrderType;
+import com.bybit.api.client.domain.position.PositionMode;
 import com.bybit.api.client.domain.position.request.PositionDataRequest;
+import com.bybit.api.client.domain.trade.OrderFilter;
 import com.bybit.api.client.domain.trade.Side;
+import com.bybit.api.client.domain.trade.StopOrderType;
 import com.bybit.api.client.domain.trade.request.TradeOrderRequest;
 import com.bybit.api.client.domain.trade.response.OrderResponse;
 import com.bybit.api.client.domain.trade.response.OrderResult;
@@ -27,6 +30,7 @@ import java.util.Optional;
 import static com.bybit.api.client.domain.TradeOrderType.MARKET;
 import static com.crypto.sick.trade.data.user.OrderResultInfo.buildOrderResultInfo;
 import static com.crypto.sick.trade.util.Utils.buildPlaceOrderResponseStub;
+import static com.crypto.sick.trade.util.Utils.getPositionIds;
 
 @Slf4j
 @Service
@@ -40,7 +44,7 @@ public class OrderService {
 
     public PlaceOrderResponse placeOrder(CredentialsState credentials, CategoryType category, Symbol symbol, Side side, TradeOrderType orderType, String qty, String price, String orderLinkId) {
         // Place order logic
-        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret());
+        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl());
         BybitApiTradeRestClient client = factory.newTradeRestClient();
         Map<String, Object> order = Map.of(
                 "category", category.getCategoryTypeId(),
@@ -63,7 +67,7 @@ public class OrderService {
 
     public OrderResultInfo placeMarketOrder(CredentialsState credentials, CategoryType category, Symbol symbol, Side side, String qty, String orderLinkId) {
         // Place order logic
-        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret());
+        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl());
         BybitApiTradeRestClient client = factory.newTradeRestClient();
         Map<String, Object> order = Map.of(
                 "category", category.getCategoryTypeId(),
@@ -95,27 +99,52 @@ public class OrderService {
                                              String stopLossPrice,
                                              Boolean reduceOnly,
                                              Boolean closeOnTrigger) {
-        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret());
+        return placeOrder(credentials, category, symbol, side, qty, MARKET, null, null, null,
+                orderLinkId, takeProfitPrice, stopLossPrice, reduceOnly, closeOnTrigger);
+    }
+
+    public OrderResultInfo placeOrder(CredentialsState credentials,
+                                      CategoryType category,
+                                      Symbol symbol,
+                                      Side side,
+                                      String qty,
+                                      TradeOrderType orderType,
+                                      String price,
+                                      String triggerPrice,
+                                      Integer triggerDiraction,
+                                      String orderLinkId,
+                                      String takeProfitPrice,
+                                      String stopLossPrice,
+                                      Boolean reduceOnly,
+                                      Boolean closeOnTrigger) {
+        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl());
         BybitApiTradeRestClient client = factory.newTradeRestClient();
         TradeOrderRequest placeOrderRequest = TradeOrderRequest.builder()
                 .category(category)
                 .symbol(symbol.getValue())
                 .side(side)
-                .orderType(MARKET)
+                .orderType(orderType)
+                .price(price)
+                .triggerPrice(triggerPrice)
+                .triggerDirection(triggerDiraction)
                 .qty(qty)
                 .takeProfit(takeProfitPrice)
                 .stopLoss(stopLossPrice)
                 .orderLinkId(orderLinkId)
                 .reduceOnly(reduceOnly)
                 .closeOnTrigger(closeOnTrigger)
+                .positionIdx(getPositionIds(side))
                 .build();
         var response = client.createOrder(placeOrderRequest);
         var placeOrderResponse = objectMapper.convertValue(response, PlaceOrderResponse.class);
+        if (placeOrderResponse.getRetCode() != 0) {
+            log.error("Error placing order: {}", placeOrderResponse.getRetMsg());
+        }
         return buildOrderResultInfo(placeOrderResponse, symbol, side, qty);
     }
 
     public void setLeaverage(Symbol symbol, CredentialsState credentials, Integer buyLeverage, Integer sellLeverage) {
-        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret()).newPositionRestClient();
+        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl()).newPositionRestClient();
         var setLeverageRequest = PositionDataRequest.builder()
                 .category(CategoryType.LINEAR)
                 .symbol(symbol.getValue())
@@ -126,7 +155,7 @@ public class OrderService {
     }
 
     public OrderResult getOrderById(CredentialsState credentials, CategoryType categoryType, OrderResponse orderResponse) {
-        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret()).newTradeRestClient();
+        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl()).newTradeRestClient();
         var tradeHistoryRequest = TradeOrderRequest.builder()
                 .category(categoryType)
                 .orderId(orderResponse.getOrderId())
@@ -144,11 +173,11 @@ public class OrderService {
         }
         // toDO: remove this
         try {
-            Thread.sleep(1000);
+            Thread.sleep(700);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret()).newTradeRestClient();
+        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl()).newTradeRestClient();
         var tradeHistoryRequest = TradeOrderRequest.builder()
                 .category(categoryType)
                 .orderId(orderId)
@@ -162,7 +191,7 @@ public class OrderService {
     }
 
     public List<PositionsResponse.PositionDto> getOpenPositions(CredentialsState credentials, CategoryType categoryType, Symbol symbol) {
-        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret())
+        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl())
                 .newPositionRestClient();
         var positionListRequest = PositionDataRequest.builder()
                 .category(categoryType)
@@ -176,7 +205,7 @@ public class OrderService {
     }
 
     public void amendOrder(CredentialsState credentials, Long orderId, String price, String qty, CategoryType category, Symbol symbol) {
-        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret());
+        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl());
         BybitApiTradeRestClient client = factory.newTradeRestClient();
         var amendOrderRequest = TradeOrderRequest.builder().orderId(String.valueOf(orderId)).category(CategoryType.SPOT).symbol(symbol.getValue())
                 .price(price)  // setting a new price, for example
@@ -187,17 +216,39 @@ public class OrderService {
     }
 
     public void cancelOrder(CredentialsState credentials, Long orderId, CategoryType category, Symbol symbol) {
-        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret());
+        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl());
         BybitApiTradeRestClient client = factory.newTradeRestClient();
         var cancelOrderRequest = TradeOrderRequest.builder().category(category).symbol(symbol.getValue()).orderId(String.valueOf(orderId)).build();
         var canceledOrder = client.cancelOrder(cancelOrderRequest);
         log.info(canceledOrder.toString());
     }
 
+    public void cancelAllOrders(CredentialsState credentials, CategoryType category, Symbol symbol) {
+        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl());
+        BybitApiTradeRestClient client = factory.newTradeRestClient();
+        var cancelAllOrdersRequest = TradeOrderRequest.builder()
+                .category(category)
+                .symbol(symbol.getValue())
+                .orderFilter(OrderFilter.STOP_ORDER)
+                .stopOrderType(StopOrderType.STOP)
+                .build();
+        log.info(client.cancelAllOrder(cancelAllOrdersRequest).toString());
+    }
+
     public void getOpenOrders(CredentialsState credentials, CategoryType category, Symbol symbol) {
-        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret()).newTradeRestClient();
+        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl()).newTradeRestClient();
         var openLinearOrdersResult = client.getOpenOrders(TradeOrderRequest.builder().category(category).symbol(symbol.getValue()).openOnly(0).build());
         log.info(openLinearOrdersResult.toString());
+    }
+
+    public void switchPositionMode(CredentialsState credentials, CategoryType category, Symbol symbol, PositionMode positionMode) {
+        var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl()).newPositionRestClient();
+        var switchPositionMode = PositionDataRequest.builder()
+                .category(category)
+                .symbol(symbol.getValue())
+                .positionMode(positionMode)
+                .build();
+        log.info("Switch position response: " + client.switchPositionMode(switchPositionMode));
     }
 
     private static OrderInfoResult buildOrderInfoStub() {

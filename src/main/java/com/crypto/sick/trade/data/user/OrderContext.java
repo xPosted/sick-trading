@@ -1,6 +1,7 @@
 package com.crypto.sick.trade.data.user;
 
 import com.bybit.api.client.domain.trade.Side;
+import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
 import com.crypto.sick.trade.dto.enums.OrderOperationTypeEnum;
 import com.crypto.sick.trade.dto.web.bybit.OrderInfoEntry;
 import com.crypto.sick.trade.dto.web.bybit.OrderInfoResult;
@@ -14,6 +15,7 @@ import lombok.*;
 @NoArgsConstructor
 public class OrderContext {
 
+    FlowTypeEnum flowType;
     OrderResultInfo orderResultInfo;
     OrderInfoResult orderInfoResult;
     double rsi;
@@ -47,8 +49,9 @@ public class OrderContext {
         return orderResultInfo.getOrderResponse().getOrderId();
     }
 
-    public static OrderContext buildOrderContext(OrderResultInfo orderResultInfo, OrderInfoResult infoResult, double rsi, double mfi, double lastPrice, OrderOperationTypeEnum operationType) {
+    public static OrderContext buildOrderContext(FlowTypeEnum flowTypeEnum, OrderResultInfo orderResultInfo, OrderInfoResult infoResult, double rsi, double mfi, double lastPrice, OrderOperationTypeEnum operationType) {
         return OrderContext.builder()
+                .flowType(flowTypeEnum)
                 .orderResultInfo(orderResultInfo)
                 .orderInfoResult(infoResult)
                 .rsi(rsi)
@@ -76,6 +79,11 @@ public class OrderContext {
     @JsonIgnore
     public boolean isOlderThanLast6Hours() {
         return System.currentTimeMillis() - orderResultInfo.getTime() > 6 * 60 * 60 * 1000;
+    }
+
+    @JsonIgnore
+    public boolean isOlderThanLast12Hours() {
+        return System.currentTimeMillis() - orderResultInfo.getTime() > 12 * 60 * 60 * 1000;
     }
 
     @JsonIgnore

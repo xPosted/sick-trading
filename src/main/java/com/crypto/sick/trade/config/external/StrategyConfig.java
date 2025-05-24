@@ -12,5 +12,7 @@ public class StrategyConfig {
     double lowCriticalValue;
     double highCriticalValue;
     double indicatorOffset;
+    double hedgeTp;
+    double hedgeSl;
 
 }

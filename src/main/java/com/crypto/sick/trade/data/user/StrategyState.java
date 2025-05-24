@@ -17,8 +17,8 @@ public class StrategyState {
     TradingStrategyStatusEnum status;
     Long statusTime;
     int stopLossTimeout;
-    double lowCriticalValue;
-    double highCriticalValue;
+    Double lowCriticalValue;
+    Double highCriticalValue;
     double priceOffset;
     double indicatorOffset;
     Double lastPrice;

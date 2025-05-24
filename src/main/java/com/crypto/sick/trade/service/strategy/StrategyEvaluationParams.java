@@ -1,5 +1,6 @@
 package com.crypto.sick.trade.service.strategy;
 
+import com.crypto.sick.trade.data.user.OrderContext;
 import com.crypto.sick.trade.data.user.StrategyState;
 import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
 import com.crypto.sick.trade.dto.enums.Symbol;
@@ -8,6 +9,7 @@ import lombok.Builder;
 import lombok.Value;
 
 import javax.enterprise.inject.spi.Producer;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Value
@@ -20,5 +22,8 @@ public class StrategyEvaluationParams {
     TaapiIntervalEnum interval;
     Function<Double, Boolean> isAvailableToSell;
     Function<Double, Boolean> isAvailableToBuy;
+    Double takeProfit;
+    Double stopLoss;
+    Optional<OrderContext> lastOrder;
 
 }

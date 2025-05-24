@@ -3,7 +3,7 @@ package com.crypto.sick.trade.config;
 import com.crypto.sick.trade.config.external.AppConfig;
 import com.crypto.sick.trade.dto.enums.StrategyEnum;
 import com.crypto.sick.trade.service.MarketRepository;
-import com.crypto.sick.trade.service.strategy.StochasticOscillatorStrategy;
+import com.crypto.sick.trade.service.strategy.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -30,13 +30,28 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public StochasticOscillatorStrategy rsiStrategy(AppConfig appConfig, MarketRepository marketRepository) {
+    public TradingStrategy rsiStrategy(AppConfig appConfig, MarketRepository marketRepository) {
         return new StochasticOscillatorStrategy(appConfig, marketRepository, StrategyEnum.RSI_STRATEGY);
     }
 
     @Bean
-    public StochasticOscillatorStrategy mfiStrategy(AppConfig appConfig, MarketRepository marketRepository) {
+    public TradingStrategy mfiStrategy(AppConfig appConfig, MarketRepository marketRepository) {
         return new StochasticOscillatorStrategy(appConfig, marketRepository, StrategyEnum.MFI_STRATEGY);
+    }
+
+    @Bean
+    public TradingStrategy hedgeStrategy(AppConfig appConfig, MarketRepository marketRepository) {
+        return new HedgeStrategy(appConfig, marketRepository, StrategyEnum.HEDGE_STRATEGY);
+    }
+
+    @Bean
+    public TradingStrategy chainStrategy(AppConfig appConfig, MarketRepository marketRepository) {
+        return new ChainStrategy(appConfig, marketRepository, StrategyEnum.CHAIN_STRATEGY);
+    }
+
+    @Bean
+    public OvertakeStrategy overtakeStrategy(MarketRepository marketRepository) {
+        return new OvertakeStrategy(marketRepository);
     }
 
     @Bean

@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.crypto.sick.trade.dto.enums.FlowTypeEnum.MAIN_FLOW;
+
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -96,68 +98,9 @@ public class AdminController {
         var updatedUserState = userState.withUpdatedMarketState(updatedCategoryState);
         userService.save(updatedUserState);
         return updatedIntervalState
-                .getLastSuccessfulOrderHistoryItem()
+                .getLastSuccessfulOrderHistoryItem(flow)
                 .orElseThrow();
     }
-
-    @PostMapping(value = "trade/buy", produces = "application/json")
-    public OrderContext makeBuyOperation(@RequestParam String user, @RequestParam Symbol symbol, @RequestParam CategoryType category, @RequestParam TaapiIntervalEnum interval) {
-        var userState = userService.findByName(user).orElseThrow(() -> new RuntimeException("User state is not available"));
-        var categoryTradingState = userState.getCategoryTradingStates().get(category);
-        var coinTradingState = categoryTradingState.getCoinTradingStates().get(symbol);
-        var coinIntervalTradingState = coinTradingState.getIntervalStates().get(interval);
-        var targetMarketState = marketRepository.getMarketState(symbol);
-        var orderContext = tradeOperationService.makeBuyOperation(symbol, coinIntervalTradingState, targetMarketState, userState.getCredentials());
-        var updatedIntervalState = coinIntervalTradingState.withOrder(orderContext);
-        var updatedCoinState = coinTradingState.withUpdatedIntervalState(interval, updatedIntervalState);
-        var updatedCategoryState = categoryTradingState.withUpdatedCoinState(symbol, updatedCoinState);
-        var updatedUserState = userState.withUpdatedMarketState(updatedCategoryState);
-        userService.save(updatedUserState);
-        return updatedIntervalState
-                .getLastSuccessfulOrderHistoryItem()
-                .orElseThrow();
-    }
-
-    @PostMapping(value = "trade/sell", produces = "application/json")
-    public OrderContext makeSellOperation(@RequestParam String user, @RequestParam Symbol symbol, @RequestParam CategoryType category, @RequestParam TaapiIntervalEnum interval) {
-        var userState = userService.findByName(user).orElseThrow(() -> new RuntimeException("User state is not available"));
-        var categoryTradingState = userState.getCategoryTradingStates().get(category);
-        var coinTradingState = categoryTradingState.getCoinTradingStates().get(symbol);
-        var coinIntervalTradingState = coinTradingState.getIntervalStates().get(interval);
-        var targetMarketState = marketRepository.getMarketState(symbol);
-        var orderContext = tradeOperationService.makeSellOperation(symbol, coinIntervalTradingState, targetMarketState, userState.getCredentials());
-        var updatedIntervalState = coinIntervalTradingState.withOrder(orderContext);
-        var updatedCoinState = coinTradingState.withUpdatedIntervalState(interval, updatedIntervalState);
-        var updatedCategoryState = categoryTradingState.withUpdatedCoinState(symbol, updatedCoinState);
-        var updatedUserState = userState.withUpdatedMarketState(updatedCategoryState);
-        userService.save(updatedUserState);
-        return updatedIntervalState
-                .getLastSuccessfulOrderHistoryItem()
-                .orElseThrow();
-    }
-
-    @PostMapping(value = "trade/stop-loss", produces = "application/json")
-    public OrderContext makeSpotStopLossOperation(@RequestParam String user, @RequestParam Symbol symbol, @RequestParam TaapiIntervalEnum interval) {
-        var userState = userService.findByName(user).orElseThrow(() -> new RuntimeException("User state is not available"));
-        var categoryTradingState = userState.getCategoryTradingStates().get(CategoryType.SPOT);
-        var coinTradingState = categoryTradingState.getCoinTradingStates().get(symbol);
-        var coinIntervalTradingState = coinTradingState.getIntervalStates().get(interval);
-        var targetMarketState = marketRepository.getMarketState(symbol);
-        var stopLossOrderOptional = coinIntervalTradingState.getLastSuccessfulOrderHistoryItem();
-        var stopLossOrder = stopLossOrderOptional
-                .filter(order -> order.getOperationType().equals(OrderOperationTypeEnum.BUY_OPERATION))
-                .orElseThrow(() -> new RuntimeException("Previous buy operation order not found"));
-        var orderCOntext = tradeOperationService.makeStopLossOperation(symbol, coinIntervalTradingState, targetMarketState, userState.getCredentials(), stopLossOrder);
-        var updatedIntervalState = coinIntervalTradingState.withOrder(orderCOntext);
-        var updatedCoinState = coinTradingState.withUpdatedIntervalState(interval, updatedIntervalState);
-        var updatedCategoryState = categoryTradingState.withUpdatedCoinState(symbol, updatedCoinState);
-        var updatedUserState = userState.withUpdatedMarketState(updatedCategoryState);
-        userService.save(updatedUserState);
-        return updatedIntervalState
-                .getLastOrderHistoryItem()
-                .orElseThrow();
-    }
-
 
     private UserStateEntity updateTradingSettings(UserStateEntity userStateEntity, Symbol symbol, CategoryType category, TaapiIntervalEnum interval, TradingSettingsInfo newSettings) {
         var categoryTradingState = userStateEntity.getCategoryTradingStates().get(category);
@@ -166,7 +109,6 @@ public class AdminController {
         var updatedCoinIntervalTradingState = coinIntervalTradingState.toBuilder()
                 .buyAmount(newSettings.getBuyAmount())
                 .sellAmount(newSettings.getSellAmount())
-                .stopLoss(newSettings.getStopLoss())
                 .stopLossTimeout(newSettings.getStopLossTimeout())
                 .interval(interval)
                 .build();

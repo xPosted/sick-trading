@@ -7,7 +7,7 @@ public enum Symbol {
     SOLUSDT("SOLUSDT",2, 1),
     ADAUSDT("ADAUSDT", 2, 0),
     XRPUSDT("XRPUSDT", 2, 0),
-    MNTUSDT("MNTUSDT", 2, 1),
+    MNTUSDT("MNTUSDT", 2, 0),
     PEPEUSDT("PEPEUSDT", 0, 0),
     TONUSDT("TONUSDT",1, 1),
     DOGEUSDT("DOGEUSDT", 1, 0),
@@ -36,7 +36,20 @@ public enum Symbol {
     AVAXUSDT("AVAXUSDT", 2,1),
     AAVEUSDT("AAVEUSDT", 2,2),
     MKRUSDT("MKRUSDT", 3,3),
-    TRBUSDT("TRBUSDT", 2,3);          // Not supported by TAAPI
+    TRBUSDT("TRBUSDT", 2,3), // Not supported by TAAPI
+    CATIUSDT("CATIUSDT", 0,0),
+    GUNUSDT("GUNUSDT", 0,0),
+    XMRUSDT("XMRUSDT", 2,2),
+    COOKIEUSDT("COOKIEUSDT", 0,0),
+    KAVAUSDT("KAVAUSDT", 0,0),
+    LAUNCHCOINUSDT("LAUNCHCOINUSDT",  0,0),
+    AWEUSDT("AWEUSDT", 0,0),
+    ZORAUSDT("ZORAUSDT", 0,0),
+    DARKUSDT("DARKUSDT", 0,0),
+    BANKUSDT("BANKUSDT", 0,0),
+    HAEDALUSDT("HAEDALUSDT", 0,0),
+    SYRUPUSDT("SYRUPUSDT", 0,0);
+
 
 
 

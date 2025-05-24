@@ -61,11 +61,16 @@ public class MarketAnalyticsSchedulerConfiguration {
         var symbols = marketRepository.getMarketStates()
                 .filter(filter)
                 .map(MarketState::getSymbol)
+                .filter(this::supportedSymbolsFilter)
                 .toList();
         taapiService.getBulkIndicators(TaapiExchangeEnum.BYBIT, symbols, appConfig.getSupportedIntervals())
                 .getResults()
                 .entrySet()
                 .forEach(this::updateMarketState);
+    }
+
+    private boolean supportedSymbolsFilter(Symbol symbol) {
+        return !TAAPI_UNSUPPORTED_SYMBOLS.contains(symbol);
     }
 
     private void updateMarketState(Map.Entry<Symbol, TaapiIndicatorResult> indicatorResultEntry) {

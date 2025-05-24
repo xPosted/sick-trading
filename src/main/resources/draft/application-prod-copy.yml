@@ -1,0 +1,263 @@
+logging:
+  level:
+    ROOT: WARN
+    com.crypto.sick.trade: INFO
+
+server:
+  port : 8081
+
+schedulers:
+  tradeInterval: 2 #seconds
+  rsiLazyUpdateInterval: 40
+  rsiForceUpdateInterval: 3
+  webSocketUpdateInterval: 60
+  walletUpdateInterval: 60
+
+sick-trader.config:
+  amazon.dynamodb:
+    region: "localhost"
+    endpoint: http://localhost:8000/
+  amazon.aws.accesskey: release14
+  amazon.aws.secretkey: release
+  supportedPercentile:
+    - PERCENTILE85
+    - PERCENTILE80
+    - PERCENTILE75
+  supportedIntervals:
+    - INTERVAL_30m
+  disableOnStopLoss: true
+  users:
+    - name: jubaka
+      enabled: true
+      trade:
+        linear:
+          #          COOKIEUSDT:
+          #            INTERVAL_30m:
+          #              buyAmount: 7 # $
+          #              leverage: 1
+          #              flows:
+          #                CHAIN_FLOW: &30M_CHAIN_FLOW_TEMPLATE
+          #                  syncStrategies: true
+          #                  stopLoss: 1.9  # %
+          #                  takeProfit: 1.3 # %
+          #                  strategies:
+          #                    CHAIN_STRATEGY:
+          #                      type: CHAIN_STRATEGY
+          #                      priceOffset: 0.1  # %
+          LTCUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1
+              buyAmount: 80 # $
+              leverage: 6
+              flows: &30M_FLOWS_TEMPLATE_VOLATILE_1
+                MAIN_FLOW: &30M_MAIN_FLOW_TEMPLATE_VOLATILE_1
+                  syncStrategies: true
+                  stopLoss: 2  # %
+                  takeProfit: 1.1 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.7  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.7
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 80
+                      lowCriticalValue: 20
+                TAKE_PROFIT_FLOW: &30M_TAKE_PROFIT_FLOW_TEMPLATE_VOLATILE_1
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 60
+                      lowCriticalValue: 40
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 68
+                      lowCriticalValue: 42
+          #                OVERTAKE_FLOW: &30M_OVERTAKE_FLOW_TEMPLATE_VOLATILE_1
+          #                  syncStrategies: false
+          #                  strategies:
+          #                    OVERTAKE_STRATEGY:
+          #                      type: OVERTAKE_STRATEGY
+          #                      priceOffset: 1.6  # %
+          XRPUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
+          SOLUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
+          TRXUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
+          BNBUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
+          SUIUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
+          ADAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
+          AVAXUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2
+              buyAmount: 80 # $
+              leverage: 6
+              flows: &30M_FLOWS_TEMPLATE_VOLATILE_2
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 2.5  # %
+                  takeProfit: 1.3 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.7  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 71
+                      lowCriticalValue: 29
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.7
+                      indicatorOffset: 4
+                      stopLossTimeout: 360
+                      highCriticalValue: 82
+                      lowCriticalValue: 18.5
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 60
+                      lowCriticalValue: 40
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 68
+                      lowCriticalValue: 42
+          #                OVERTAKE_FLOW:
+          #                  syncStrategies: false
+          #                  strategies:
+          #                    OVERTAKE_STRATEGY:
+          #                      type: OVERTAKE_STRATEGY
+          #                      priceOffset: 2.2  # %
+          AAVEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
+          HBARUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
+          DOGEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
+          VIRTUALUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
+    - name: trader-igor
+      enabled: true
+      trade:
+        linear:
+          XRPUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+              buyAmount: 8 # $
+              leverage: 2
+              flows: &30M_FLOWS_TEMPLATE_VOLATILE_1_IGOR
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 4  # %
+                  takeProfit: 1.4 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.7  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.7
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 80
+                      lowCriticalValue: 20
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 60
+                      lowCriticalValue: 40
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 68
+                      lowCriticalValue: 42
+          LTCUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+          SOLUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+          TRXUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+          BNBUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+          ADAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+          AVAXUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2_IGOR
+              buyAmount: 8 # $
+              leverage: 2
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 4.5  # %
+                  takeProfit: 1.8 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.7  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 71
+                      lowCriticalValue: 29
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.7
+                      indicatorOffset: 4
+                      stopLossTimeout: 360
+                      highCriticalValue: 82
+                      lowCriticalValue: 18.5
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: true
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 60
+                      lowCriticalValue: 40
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 68
+                      lowCriticalValue: 42
+          AAVEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_IGOR
+          HBARUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_IGOR
+          DOGEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_IGOR
+  debug-mode: false

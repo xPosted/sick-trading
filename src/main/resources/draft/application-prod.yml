@@ -1,0 +1,61 @@
+logging:
+  level:
+    ROOT: WARN
+    com.crypto.sick.trade: INFO
+
+server:
+  port : 8081
+
+schedulers:
+  tradeInterval: 2 #seconds
+  rsiLazyUpdateInterval: 45
+  rsiForceUpdateInterval: 4
+  webSocketUpdateInterval: 60
+  walletUpdateInterval: 60
+
+sick-trader.config:
+  amazon.dynamodb:
+    region: "localhost"
+    endpoint: http://localhost:8000/
+  amazon.aws.accesskey: release7
+  amazon.aws.secretkey: release
+  supportedPercentile:
+    - PERCENTILE85
+    - PERCENTILE80
+    - PERCENTILE75
+  supportedIntervals:
+    - INTERVAL_30m
+  disableOnStopLoss: true
+  users:
+    - name: jubaka
+      enabled: true
+      trade:
+        linear:
+          TRXUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE
+              buyAmount: 20 # $
+              leverage: 2
+              flows:
+                CHAIN_FLOW: &30M_CHAIN_FLOW_TEMPLATE
+                  syncStrategies: true
+                  stopLoss: 0.2  # %
+                  takeProfit: 0.9 # %
+                  strategies:
+                    CHAIN_STRATEGY:
+                      type: CHAIN_STRATEGY
+                      priceOffset: 0.4  # %
+  debug-mode: false
+
+  COOKIEUSDT:
+    INTERVAL_30m:
+      buyAmount: 10 # $
+      leverage: 1
+      flows:
+        CHAIN_FLOW: &30M_CHAIN_FLOW_TEMPLATE
+          syncStrategies: true
+          stopLoss: 2  # %
+          takeProfit: 0.7 # %
+          strategies:
+            CHAIN_STRATEGY:
+              type: CHAIN_STRATEGY
+              priceOffset: 0.35  # %

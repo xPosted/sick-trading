@@ -1,18 +1,20 @@
 package com.crypto.sick.trade.dto.web.bybit;
 
 import com.bybit.api.client.domain.market.response.tickers.TickersResult;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class TickerResponse extends ByBitApiResponse {
 
     @JsonProperty("result")
-    private TickersResult result;
+    private TickerResult result;
 
     @Data
     public static class TickerResult {
@@ -20,11 +22,12 @@ public class TickerResponse extends ByBitApiResponse {
         private String category;
 
         @JsonProperty("list")
-        private List<Ticker> tickers;
+        private List<TickerEntry> tickerEntries;
     }
 
     @Data
-    public static class Ticker {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class TickerEntry {
         @JsonProperty("symbol")
         private String symbol;
 

@@ -2,12 +2,16 @@ package com.crypto.sick.trade.util;
 
 import com.bybit.api.client.domain.CategoryType;
 import com.bybit.api.client.domain.market.response.tickers.TickerEntry;
+import com.bybit.api.client.domain.trade.PositionIdx;
+import com.bybit.api.client.domain.trade.Side;
 import com.bybit.api.client.domain.trade.response.OrderResponse;
 import com.crypto.sick.trade.config.external.AppConfig;
 import com.crypto.sick.trade.config.external.TradeConfig;
 import com.crypto.sick.trade.config.external.UserTradeConfig;
 import com.crypto.sick.trade.dto.enums.CoinEnum;
+import com.crypto.sick.trade.dto.enums.StrategyEnum;
 import com.crypto.sick.trade.dto.enums.Symbol;
+import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.crypto.sick.trade.dto.web.bybit.PlaceOrderResponse;
 import com.crypto.sick.trade.dto.web.bybit.TickerResponse;
 import com.crypto.sick.trade.dto.web.bybit.WalletResponse;
@@ -30,11 +34,35 @@ public class Utils {
     public static final Integer FIVE = 5;
     public static final Double FIVE_POINT_THREE = 5.3D;
 
+    public static final Set TAAPI_UNSUPPORTED_SYMBOLS = Set.of(
+            Symbol.GUNUSDT, Symbol.XMRUSDT, Symbol.LAUNCHCOINUSDT, Symbol.ZORAUSDT, Symbol.DARKUSDT, Symbol.AWEUSDT,
+            Symbol.BANKUSDT, Symbol.HAEDALUSDT, Symbol.SYRUPUSDT, Symbol.KAVAUSDT, Symbol.TRBUSDT
+    );
+
+    public static final Set WEBSOCKET_UNSUPPORTED_SYMBOLS = Set.of(
+            Symbol.LAUNCHCOINUSDT, Symbol.ZORAUSDT, Symbol.DARKUSDT, Symbol.AWEUSDT, Symbol.BANKUSDT, Symbol.HAEDALUSDT, Symbol.SYRUPUSDT, Symbol.KAVAUSDT, Symbol.TRBUSDT
+    );
+
+    public static TradingStrategyStatusEnum getInitialStatus(StrategyEnum strategy) {
+        return switch (strategy) {
+            case CHAIN_STRATEGY -> TradingStrategyStatusEnum.SETUP;
+            default -> TradingStrategyStatusEnum.SLEEPING;
+        };
+    }
+
+    public static PositionIdx getPositionIds(Side side) {
+        return switch (side) {
+            case BUY -> PositionIdx.HEDGE_MODE_BUY;
+            case SELL -> PositionIdx.HEDGE_MODE_SELL;
+            default -> throw new IllegalArgumentException("Unsupported side: " + side);
+        };
+    }
+
     public static double getLastPrice(TickerResponse tickerResponse, Symbol symbol) {
         return tickerResponse.getResult().getTickerEntries().stream()
                 .filter(ticker -> ticker.getSymbol().equals(symbol.getValue()))
                 .findFirst()
-                .map(TickerEntry::getLastPrice)
+                .map(TickerResponse.TickerEntry::getLastPrice)
                 .map(Double::valueOf)
                 .orElse(0.0);
     }
@@ -175,6 +203,33 @@ public class Utils {
             }
             case TRBUSDT -> {
                 return CoinEnum.TRB;
+            }
+            case CATIUSDT -> {
+                return CoinEnum.CATI;
+            }
+            case GUNUSDT -> {
+                return CoinEnum.GUN;
+            }
+            case XMRUSDT -> {
+                return CoinEnum.XMR;
+            }
+            case COOKIEUSDT -> {
+                return CoinEnum.COOKIE;
+            }
+            case KAVAUSDT -> {
+                return CoinEnum.KAVA;
+            }
+            case LAUNCHCOINUSDT -> {
+                return CoinEnum.LAUNCHCOIN;
+            }
+            case AWEUSDT -> {
+                return CoinEnum.AWE;
+            }
+            case ZORAUSDT -> {
+                return CoinEnum.ZORA;
+            }
+            case DARKUSDT -> {
+                return CoinEnum.DARK;
             }
             default -> {
                 throw new IllegalArgumentException("Unsupported symbol: " + symbol);

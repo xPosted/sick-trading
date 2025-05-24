@@ -13,10 +13,16 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum.SLEEPING;
+import static com.crypto.sick.trade.util.Utils.getInitialStatus;
 
 @Slf4j
 @Service
@@ -198,8 +204,6 @@ public class OnStartValidation {
                 .buyAmount(symbolIntervalTradeConfig.getBuyAmount())
                 .sellAmount(symbolIntervalTradeConfig.getSellAmount())
                 .leverage(symbolIntervalTradeConfig.getLeverage())
-                .stopLoss(symbolIntervalTradeConfig.getStopLoss())
-                .takeProfit(symbolIntervalTradeConfig.getTakeProfit())
                 .orderHistory(orderHistory)
                 .build();
     }
@@ -211,6 +215,8 @@ public class OnStartValidation {
                         .status(SLEEPING)
                         .strategies(buildStrategiesStates(entry.getValue()))
                         .syncStrategies(entry.getValue().isSyncStrategies())
+                        .takeProfit(entry.getValue().getTakeProfit())
+                        .stopLoss(entry.getValue().getStopLoss())
                         .build())
                 .collect(Collectors.toMap(FlowState::getFlowType, flowState -> flowState));
     }
@@ -219,7 +225,7 @@ public class OnStartValidation {
         return flowConfig.getStrategies().entrySet().stream()
                 .map(entry -> StrategyState.builder()
                         .strategy(entry.getKey())
-                        .status(SLEEPING)
+                        .status(getInitialStatus(entry.getKey()))
                         .statusTime(System.currentTimeMillis())
                         .priceOffset(entry.getValue().getPriceOffset())
                         .indicatorOffset(entry.getValue().getIndicatorOffset())

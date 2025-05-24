@@ -11,8 +11,6 @@ public class SymbolIntervalTradeConfig {
     double buyAmount;
     double sellAmount;
     int leverage;
-    double stopLoss;
-    double takeProfit;
     boolean syncStrategies;
     Map<FlowTypeEnum, FlowConfig> flows;
 

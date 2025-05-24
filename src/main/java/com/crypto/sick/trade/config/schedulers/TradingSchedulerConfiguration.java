@@ -7,10 +7,7 @@ import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.crypto.sick.trade.service.UserService;
 import com.crypto.sick.trade.service.action.ActionRouter;
-import com.crypto.sick.trade.service.strategy.StochasticOscillatorStrategy;
-import com.crypto.sick.trade.service.strategy.StrategyEvaluationParams;
-import com.crypto.sick.trade.service.strategy.StrategyEvaluationParamsBuilder;
-import com.crypto.sick.trade.service.strategy.StrategyEvaluationResult;
+import com.crypto.sick.trade.service.strategy.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,7 +27,7 @@ public class TradingSchedulerConfiguration {
     @Autowired
     private UserService userService;
     @Autowired
-    private List<StochasticOscillatorStrategy> strategyList;
+    private List<TradingStrategy> strategyList;
     @Autowired
     private ActionRouter actionRouter;
 
@@ -55,6 +52,7 @@ public class TradingSchedulerConfiguration {
 
     private CategoryTradingState tradeCategory(CategoryTradingState categoryTradingState, CredentialsState credentials) {
         var updatedSymbolTradingStates = categoryTradingState.getCoinTradingStates().values().stream()
+                .parallel()
                 .map(coinTradingState -> tradeSymbol(coinTradingState, credentials))
                 .collect(Collectors.toMap(CoinTradingState::getSymbol, coinTradingState -> coinTradingState));
         return categoryTradingState.toBuilder()
@@ -90,7 +88,7 @@ public class TradingSchedulerConfiguration {
 
     private StrategyEvaluationResult evaluateStrategy(StrategyEvaluationParams params) {
         var strategy = strategyList.stream()
-                .filter(s -> s.getStrategyName().equals(params.getStrategyState().getStrategy()))
+                .filter(s -> s.validStrategy(params))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Strategy not found for evaluation: " + params.getStrategyState().getStrategy()));
         return strategy.evaluate(params);

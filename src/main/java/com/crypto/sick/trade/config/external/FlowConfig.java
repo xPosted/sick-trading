@@ -13,5 +13,7 @@ public class FlowConfig {
 
     Map<StrategyEnum, StrategyConfig> strategies;
     boolean syncStrategies;
+    Double stopLoss;
+    Double takeProfit;
 
 }

@@ -13,7 +13,10 @@ import java.util.stream.Collectors;
 
 import static com.bybit.api.client.domain.trade.Side.BUY;
 import static com.bybit.api.client.domain.trade.Side.SELL;
+import static com.crypto.sick.trade.dto.enums.FlowTypeEnum.MAIN_FLOW;
+import static com.crypto.sick.trade.dto.enums.FlowTypeEnum.OVERTAKE_FLOW;
 import static com.crypto.sick.trade.util.Utils.*;
+import static java.util.Objects.nonNull;
 
 @Data
 @Builder(toBuilder = true)
@@ -31,9 +34,7 @@ public class CoinIntervalTradingState {
     double buyAmount;
     double sellAmount;
     int leverage;
- //   double tradeOffset;
-    double stopLoss;
-    double takeProfit;
+    //   double tradeOffset;
     int stopLossTimeout;
 
     @Builder.Default
@@ -66,16 +67,17 @@ public class CoinIntervalTradingState {
                 .build();
     }
 
-    public CoinIntervalTradingState closeLastSuccessfulPosition(Side side) {
-        var lastSuccessfulShortPosOptional = getLastSuccessfulOrderHistoryItem()
+    public CoinIntervalTradingState closeLastSuccessfulPosition(Side side, FlowTypeEnum flowType) {
+        var lastSuccessfulShortPosOptional = getLastSuccessfulOrderHistoryItem(flowType)
                 .filter(o -> o.getSide().equals(side));
         if (lastSuccessfulShortPosOptional.isEmpty()) {
             log.warn("Can't find last successful position for side {}", side);
             return this;
         }
         var lastSuccessfulShortPos = lastSuccessfulShortPosOptional.get();
-        var updatedOrders =orderHistory.stream()
-                .filter(o -> ! o.getOrderId().equals(lastSuccessfulShortPos.getOrderId()))
+        var updatedOrders = orderHistory.stream()
+                .filter(o -> nonNull(o.getOrderId()))
+                .filter(o -> !o.getOrderId().equals(lastSuccessfulShortPos.getOrderId()))
                 .collect(Collectors.toSet());
         updatedOrders.add(lastSuccessfulShortPos.withClosed(true));
         return toBuilder()
@@ -113,15 +115,16 @@ public class CoinIntervalTradingState {
     }
 
     @JsonIgnore
-    public Optional<OrderContext> getLastSuccessfulOrderHistoryItem() {
+    public Optional<OrderContext> getLastSuccessfulOrderHistoryItem(FlowTypeEnum flowType) {
         return getOrderHistory().stream()
-                .filter(order -> order.getOrderResultInfo().getRetCode() == ZERO) // order should be successful
+                .filter(order -> order.getOrderResultInfo().getRetCode() == ZERO)
+                .filter(order -> order.getFlowType().equals(flowType))// order should be successful
                 .max(Comparator.comparingLong(context -> context.getOrderResultInfo().getTime()));
     }
 
     @JsonIgnore
     public boolean isAvailableToBuy(Double lastPrice) {
-        var lastOrder = getLastSuccessfulOrderHistoryItem();
+        var lastOrder = getLastSuccessfulOrderHistoryItem(MAIN_FLOW);
         switch (category) {
             case SPOT:
                 var acquiredInUsdt = getAcquiredQty() * lastPrice;
@@ -148,13 +151,13 @@ public class CoinIntervalTradingState {
         switch (category) {
             case SPOT: {
                 var acquiredInUsdt = getAcquiredQty() * lastPrice;
-                return getLastSuccessfulOrderHistoryItem()
+                return getLastSuccessfulOrderHistoryItem(MAIN_FLOW)
                         .filter(orderContext -> orderContext.getSide().equals(BUY))
                         .isPresent() && acquiredInUsdt > FIVE_POINT_THREE;
 
             }
             case LINEAR: {
-                var lastOrder = getLastSuccessfulOrderHistoryItem();
+                var lastOrder = getLastSuccessfulOrderHistoryItem(MAIN_FLOW);
                 return lastOrder.isEmpty() ||
                         lastOrder.filter(OrderContext::isLongOperationType).isPresent() ||
                         lastOrder.filter(OrderContext::isOlderThanLast6Hours).isPresent();
@@ -165,18 +168,33 @@ public class CoinIntervalTradingState {
     }
 
     @JsonIgnore
+    public boolean isAvailableToOverTake(Double lastPrice) {
+        var lastOrder = getLastSuccessfulOrderHistoryItem(MAIN_FLOW);
+        var lastOvertakeOrder = getLastSuccessfulOrderHistoryItem(OVERTAKE_FLOW);
+        return lastOvertakeOrder.isEmpty() ||
+                lastOrder
+                        .map(OrderContext::getOrderResultInfo)
+                        .map(OrderResultInfo::getTime)
+                        .filter(time -> time >
+                                lastOvertakeOrder.map(OrderContext::getOrderResultInfo)
+                                        .map(OrderResultInfo::getTime)
+                                        .orElse(Long.MAX_VALUE))
+                        .isPresent();
+    }
+
+    @JsonIgnore
     public boolean isAvailableToCloseShortPosition() {
-        return getLastSuccessfulOrderHistoryItem()
+        return getLastSuccessfulOrderHistoryItem(MAIN_FLOW)
                 .filter(OrderContext::isShortOperationType)
-                .filter(order -> ! order.isClosed())
+                .filter(order -> !order.isClosed())
                 .isPresent();
     }
 
     @JsonIgnore
     public boolean isAvailableToCloseLongPosition() {
-        return getLastSuccessfulOrderHistoryItem()
+        return getLastSuccessfulOrderHistoryItem(MAIN_FLOW)
                 .filter(OrderContext::isLongOperationType)
-                .filter(order -> ! order.isClosed())
+                .filter(order -> !order.isClosed())
                 .isPresent();
     }
 

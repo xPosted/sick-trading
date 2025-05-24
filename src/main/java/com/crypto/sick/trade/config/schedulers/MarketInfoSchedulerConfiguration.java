@@ -38,19 +38,25 @@ public class MarketInfoSchedulerConfiguration {
     @Autowired
     private MarketRepository marketRepository;
 
-    //   @Async
-    //   @Scheduled(fixedRate = 1500)
+    @Async
+    @Scheduled(fixedRate = 1000, initialDelay = 7000)
     public void updateLastPriceHttp() {
-        List<Symbol> symbols = Utils.getSymbols(appConfig);
-        symbols.stream()
+        var allSymbols = Utils.getSymbols(appConfig).stream()
+                .filter(Utils.WEBSOCKET_UNSUPPORTED_SYMBOLS::contains)
+                .toList();
+        allSymbols.stream()
+                .parallel()
                 .map(marketRepository::getMarketState)
                 .forEach(this::updateLastPrice);
     }
 
     @PostConstruct
     public void init() {
-        var symbols = splitSymbols(Utils.getSymbols(appConfig));
-        tickers = symbols.stream()
+        var allSymbols = Utils.getSymbols(appConfig).stream()
+                .filter(s -> ! Utils.WEBSOCKET_UNSUPPORTED_SYMBOLS.contains(s))
+                .toList();
+        var splitedSymbols = splitSymbols(allSymbols);
+        tickers = splitedSymbols.stream()
                 .map(part -> new TickerWebSocketService(marketRepository, part))
                 .collect(Collectors.toList());
     }
@@ -89,7 +95,7 @@ public class MarketInfoSchedulerConfiguration {
     }
 
     private void updateLastPrice(MarketState marketState) {
-        var tickerResponse = marketInfoService.getTickers(CategoryType.SPOT, marketState.getSymbol());
+        var tickerResponse = marketInfoService.getTickers(CategoryType.LINEAR, marketState.getSymbol());
         var lastPrice = Utils.getLastPrice(tickerResponse, marketState.getSymbol());
         marketState.setLastPrice(lastPrice);
     }
