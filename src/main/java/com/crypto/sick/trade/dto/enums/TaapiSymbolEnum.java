@@ -48,7 +48,8 @@ public enum TaapiSymbolEnum {
     DARKUSDT("DARK/USDT"),
     BANKUSDT("BANK/USDT"),
     HAEDALUSDT("HAEDAL/USDT"),
-    SYRUPUSDT("SYRUP/USDT");
+    SYRUPUSDT("SYRUP/USDT"),
+    UNIUSDT("UNI/USDT");
 
 
     private final String value;
@@ -111,6 +112,7 @@ public enum TaapiSymbolEnum {
             case BANKUSDT -> TaapiSymbolEnum.BANKUSDT;
             case HAEDALUSDT -> TaapiSymbolEnum.HAEDALUSDT;
             case SYRUPUSDT -> TaapiSymbolEnum.SYRUPUSDT;
+            case UNIUSDT -> TaapiSymbolEnum.UNIUSDT;
 
         };
     }

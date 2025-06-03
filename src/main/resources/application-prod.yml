@@ -8,7 +8,7 @@ server:
 
 schedulers:
   tradeInterval: 2 #seconds
-  rsiLazyUpdateInterval: 40
+  rsiLazyUpdateInterval: 30
   rsiForceUpdateInterval: 2
   webSocketUpdateInterval: 60
   walletUpdateInterval: 60
@@ -53,19 +53,19 @@ sick-trader.config:
               flows: &30M_FLOWS_TEMPLATE_VOLATILE_1
                 MAIN_FLOW: &30M_MAIN_FLOW_TEMPLATE_VOLATILE_1
                   syncStrategies: true
-                  stopLoss: 3.5  # %
-                  takeProfit: 5 # %
+                  stopLoss: 2.8  # %
+                  takeProfit: 4.5 # %
                   strategies:
                     RSI_STRATEGY:
                       type: RSI_STRATEGY
-                      priceOffset: 0.7  # %
+                      priceOffset: 0.6  # %
                       indicatorOffset: 3
                       stopLossTimeout: 360
                       highCriticalValue: 70
                       lowCriticalValue: 30
                     MFI_STRATEGY:
                       type: MFI_STRATEGY
-                      priceOffset: 0.7
+                      priceOffset: 0.6
                       indicatorOffset: 3
                       stopLossTimeout: 360
                       highCriticalValue: 80
@@ -78,21 +78,21 @@ sick-trader.config:
                       priceOffset: 0.3  # %
                       indicatorOffset: 2
                       stopLossTimeout: 360
-                      highCriticalValue: 60
-                      lowCriticalValue: 40
+                      highCriticalValue: 58
+                      lowCriticalValue: 42
                     MFI_STRATEGY:
                       type: MFI_STRATEGY
                       priceOffset: 0.3  # %
                       indicatorOffset: 3
                       stopLossTimeout: 360
-                      highCriticalValue: 67
-                      lowCriticalValue: 33
+                      highCriticalValue: 69
+                      lowCriticalValue: 31
                 OVERTAKE_FLOW: &30M_OVERTAKE_FLOW_TEMPLATE_VOLATILE_1
                   syncStrategies: false
                   strategies:
                     OVERTAKE_STRATEGY:
                       type: OVERTAKE_STRATEGY
-                      priceOffset: 1.8  # %
+                      priceOffset: 1  # %
           XRPUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
           SOLUSDT:
@@ -112,8 +112,8 @@ sick-trader.config:
               flows: &30M_FLOWS_TEMPLATE_VOLATILE_2
                 MAIN_FLOW:
                   syncStrategies: true
-                  stopLoss: 4  # %
-                  takeProfit: 6 # %
+                  stopLoss: 3.5  # %
+                  takeProfit: 5.5 # %
                   strategies:
                     RSI_STRATEGY:
                       type: RSI_STRATEGY
@@ -127,7 +127,7 @@ sick-trader.config:
                       priceOffset: 0.7
                       indicatorOffset: 4
                       stopLossTimeout: 360
-                      highCriticalValue: 82
+                      highCriticalValue: 81.5
                       lowCriticalValue: 18.5
                 TAKE_PROFIT_FLOW: &30M_TAKE_PROFIT_FLOW_TEMPLATE_VOLATILE_2
                   syncStrategies: false
@@ -137,21 +137,21 @@ sick-trader.config:
                       priceOffset: 0.3  # %
                       indicatorOffset: 2
                       stopLossTimeout: 360
-                      highCriticalValue: 60
-                      lowCriticalValue: 40
+                      highCriticalValue: 58
+                      lowCriticalValue: 42
                     MFI_STRATEGY:
                       type: MFI_STRATEGY
                       priceOffset: 0.3  # %
                       indicatorOffset: 3
                       stopLossTimeout: 360
-                      highCriticalValue: 67
-                      lowCriticalValue: 33
+                      highCriticalValue: 69
+                      lowCriticalValue: 31
                 OVERTAKE_FLOW:
                   syncStrategies: false
                   strategies:
                     OVERTAKE_STRATEGY:
                       type: OVERTAKE_STRATEGY
-                      priceOffset: 2.2  # %
+                      priceOffset: 1.4  # %
           AAVEUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
           HBARUSDT:
@@ -160,5 +160,125 @@ sick-trader.config:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
           VIRTUALUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
+          UNIUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
+    - name: jubaka
+      enabled: true
+      trade:
+        linear:
+          LTCUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+              buyAmount: 60 # $
+              leverage: 5
+              flows: &30M_FLOWS_TEMPLATE_VOLATILE_1
+                MAIN_FLOW: &30M_MAIN_FLOW_TEMPLATE_VOLATILE_1
+                  syncStrategies: true
+                  stopLoss: 2.8  # %
+                  takeProfit: 4.5 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.6  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.6
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 80
+                      lowCriticalValue: 20
+                TAKE_PROFIT_FLOW: &30M_TAKE_PROFIT_FLOW_TEMPLATE_VOLATILE_1
+                  syncStrategies: false
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 58
+                      lowCriticalValue: 42
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 69
+                      lowCriticalValue: 31
+                OVERTAKE_FLOW: &30M_OVERTAKE_FLOW_TEMPLATE_VOLATILE_1
+                  syncStrategies: false
+                  strategies:
+                    OVERTAKE_STRATEGY:
+                      type: OVERTAKE_STRATEGY
+                      priceOffset: 1  # %
+          XRPUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          SOLUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          TRXUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          BNBUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          SUIUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          ADAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          AVAXUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
+              buyAmount: 60 # $
+              leverage: 5
+              flows: &30M_FLOWS_TEMPLATE_VOLATILE_2
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 3.5  # %
+                  takeProfit: 5.5 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.7  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 71
+                      lowCriticalValue: 29
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.7
+                      indicatorOffset: 4
+                      stopLossTimeout: 360
+                      highCriticalValue: 81.5
+                      lowCriticalValue: 18.5
+                TAKE_PROFIT_FLOW: &30M_TAKE_PROFIT_FLOW_TEMPLATE_VOLATILE_2
+                  syncStrategies: false
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 58
+                      lowCriticalValue: 42
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 69
+                      lowCriticalValue: 31
+                OVERTAKE_FLOW:
+                  syncStrategies: false
+                  strategies:
+                    OVERTAKE_STRATEGY:
+                      type: OVERTAKE_STRATEGY
+                      priceOffset: 1.4  # %
+          AAVEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
+          HBARUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
+          DOGEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
+          VIRTUALUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
 
   debug-mode: false

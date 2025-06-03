@@ -4,7 +4,6 @@ import com.bybit.api.client.domain.CategoryType;
 import com.bybit.api.client.domain.TradeOrderType;
 import com.bybit.api.client.domain.position.PositionMode;
 import com.bybit.api.client.domain.trade.Side;
-import com.crypto.sick.trade.config.external.AppConfig;
 import com.crypto.sick.trade.data.user.CoinIntervalTradingState;
 import com.crypto.sick.trade.data.user.CredentialsState;
 import com.crypto.sick.trade.data.user.FlowState;
@@ -16,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -105,7 +103,7 @@ public class TradeOperationService {
         var flowType = operationContext.getFlowType();
 
         setHedgePositionMode(credentials, LINEAR, symbol);
-        orderService.setLeaverage(symbol, credentials, leverage, leverage);
+        orderService.setLeverage(symbol, credentials, leverage, leverage);
         var qty = BigDecimal.valueOf(buyAmount).divide(lastPrice, symbol.getLinearScale(), RoundingMode.DOWN);
         var takeProfitPrice = tp
                 .filter(tpValue -> tpValue > 0)
@@ -139,7 +137,7 @@ public class TradeOperationService {
         var triggerPrice = BigDecimal.valueOf(operationContext.getPrice());
 
         setHedgePositionMode(credentials, LINEAR, symbol);
-        orderService.setLeaverage(symbol, credentials, leverage, leverage);
+        orderService.setLeverage(symbol, credentials, leverage, leverage);
         var qty = BigDecimal.valueOf(buyAmount).divide(marketPrice, symbol.getLinearScale(), RoundingMode.DOWN);
         var takeProfitPrice = triggerPrice.subtract(BigDecimal.valueOf(getPercentageOf(tp, marketPrice.doubleValue(), marketPrice.scale())));
         var stopLossPrice = triggerPrice.add(BigDecimal.valueOf(getPercentageOf(sl, marketPrice.doubleValue(), marketPrice.scale())));
@@ -165,7 +163,7 @@ public class TradeOperationService {
         var triggerPrice = BigDecimal.valueOf(operationContext.getPrice());
 
         setHedgePositionMode(credentials, LINEAR, symbol);
-        orderService.setLeaverage(symbol, credentials, leverage, leverage);
+        orderService.setLeverage(symbol, credentials, leverage, leverage);
         var qty = BigDecimal.valueOf(buyAmount).divide(marketPrice, symbol.getLinearScale(), RoundingMode.DOWN);
         var takeProfitPrice = triggerPrice.add(BigDecimal.valueOf(getPercentageOf(tp, marketPrice.doubleValue(), marketPrice.scale())));
         var stopLossPrice = triggerPrice.subtract(BigDecimal.valueOf(getPercentageOf(sl, marketPrice.doubleValue(), marketPrice.scale())));
@@ -195,7 +193,7 @@ public class TradeOperationService {
         var flowType = operationContext.getFlowType();
 
         setHedgePositionMode(credentials, LINEAR, symbol);
-        orderService.setLeaverage(symbol, credentials, leverage, leverage);
+        orderService.setLeverage(symbol, credentials, leverage, leverage);
         var qty = BigDecimal.valueOf(buyAmount).divide(lastPrice, symbol.getLinearScale(), RoundingMode.DOWN);
         var takeProfitPrice = tp
                 .filter(tpValue -> tpValue > 0)
@@ -246,7 +244,7 @@ public class TradeOperationService {
     }
 
     public void testShortLinearOrder(CredentialsState credentials) {
-        orderService.setLeaverage(Symbol.SCAUSDT, credentials, 2,2);
+        orderService.setLeverage(Symbol.SCAUSDT, credentials, 2,2);
         var orderResultInfo = orderService.placeMarketOrder2(credentials, LINEAR, Symbol.SCAUSDT, SELL, "70", "TEST_LINEAR_ORDER_" + new Random().nextInt(), "0.07", "0.083", null, null);
         log.info("Test order result: " + orderResultInfo);
         orderResultInfo = orderService.placeMarketOrder2(credentials, LINEAR, Symbol.SCAUSDT, BUY, "0", "TEST_LINEAR_ORDER_" + new Random().nextInt(), null, null, true, true);
@@ -254,7 +252,7 @@ public class TradeOperationService {
     }
 
     public void testLongLinearOrder(CredentialsState credentials) {
-        orderService.setLeaverage(Symbol.SCAUSDT, credentials, 2,2);
+        orderService.setLeverage(Symbol.SCAUSDT, credentials, 2,2);
         var orderResultInfo = orderService.placeMarketOrder2(credentials, LINEAR, Symbol.SCAUSDT, SELL, "5", "TEST_LINEAR_ORDER_" + new Random().nextInt(), "0.07", "0.083", null, null);
         log.info("Test order result: " + orderResultInfo);
         orderResultInfo = orderService.placeMarketOrder2(credentials, LINEAR, Symbol.SCAUSDT, BUY, "0", "TEST_LINEAR_ORDER_" + new Random().nextInt(), null, null, true, true);

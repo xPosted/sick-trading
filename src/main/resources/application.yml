@@ -5,3 +5,16 @@ sick-trader.config.credentials:
       secret: "bybit-secret"
   taapiUrl: "https://api.taapi.io/"
   taapiSecret: "taapi-secret"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    enable:
+      feign: true

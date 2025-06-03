@@ -8,6 +8,8 @@ import com.crypto.sick.trade.feign.TaapiClient;
 import com.crypto.sick.trade.util.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +26,13 @@ public class TaapiService {
 
     private static final int CONSTRUCTS_LIMIT = 3;
 
+
     @Autowired
     private Credentials credentials;
     @Autowired
     private TaapiClient taapiClient;
+    @Autowired
+    private MeterRegistry meterRegistry;
 
     public Double getRsi(TaapiExchangeEnum exchange, Symbol symbol, TaapiIntervalEnum interval) {
         var taapiSymbol = TaapiSymbolEnum.from(symbol);

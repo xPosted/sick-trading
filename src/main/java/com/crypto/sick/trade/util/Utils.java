@@ -50,7 +50,21 @@ public class Utils {
         };
     }
 
-    public static PositionIdx getPositionIds(Side side) {
+    public static PositionIdx getPositionIds(Side side, Boolean reduceOnly) {
+       return reduceOnly == null || !reduceOnly
+                ? getStraightPositionIds(side)
+                : getReversedPositionIds(side);
+    }
+
+    private static PositionIdx getReversedPositionIds(Side side) {
+        return switch (side) {
+            case BUY -> PositionIdx.HEDGE_MODE_SELL;
+            case SELL -> PositionIdx.HEDGE_MODE_BUY;
+            default -> throw new IllegalArgumentException("Unsupported side: " + side);
+        };
+    }
+
+    private static PositionIdx getStraightPositionIds(Side side) {
         return switch (side) {
             case BUY -> PositionIdx.HEDGE_MODE_BUY;
             case SELL -> PositionIdx.HEDGE_MODE_SELL;
@@ -230,6 +244,9 @@ public class Utils {
             }
             case DARKUSDT -> {
                 return CoinEnum.DARK;
+            }
+            case UNIUSDT -> {
+                return CoinEnum.UNI;
             }
             default -> {
                 throw new IllegalArgumentException("Unsupported symbol: " + symbol);

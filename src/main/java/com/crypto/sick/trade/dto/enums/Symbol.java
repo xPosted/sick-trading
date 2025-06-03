@@ -48,7 +48,8 @@ public enum Symbol {
     DARKUSDT("DARKUSDT", 0,0),
     BANKUSDT("BANKUSDT", 0,0),
     HAEDALUSDT("HAEDALUSDT", 0,0),
-    SYRUPUSDT("SYRUPUSDT", 0,0);
+    SYRUPUSDT("SYRUPUSDT", 0,0),
+    UNIUSDT("UNIUSDT", 1,1);
 
 
 
