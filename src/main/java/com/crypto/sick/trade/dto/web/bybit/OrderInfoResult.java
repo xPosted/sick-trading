@@ -1,6 +1,5 @@
 package com.crypto.sick.trade.dto.web.bybit;
 
-import com.bybit.api.client.domain.trade.response.OrderEntry;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

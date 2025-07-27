@@ -1,12 +1,11 @@
 package com.crypto.sick.trade.util;
 
+import com.bybit.api.client.config.BybitApiConfig;
 import com.bybit.api.client.domain.CategoryType;
-import com.bybit.api.client.domain.market.response.tickers.TickerEntry;
 import com.bybit.api.client.domain.trade.PositionIdx;
 import com.bybit.api.client.domain.trade.Side;
 import com.bybit.api.client.domain.trade.response.OrderResponse;
 import com.crypto.sick.trade.config.external.AppConfig;
-import com.crypto.sick.trade.config.external.TradeConfig;
 import com.crypto.sick.trade.config.external.UserTradeConfig;
 import com.crypto.sick.trade.dto.enums.CoinEnum;
 import com.crypto.sick.trade.dto.enums.StrategyEnum;
@@ -87,6 +86,7 @@ public class Utils {
                 .flatMap(tradeConfig -> Stream.concat(Stream.of(tradeConfig.get(CategoryType.SPOT)), Stream.of(tradeConfig.get(CategoryType.LINEAR))))
                 .map(Map::keySet)
                 .flatMap(Set::stream)
+                .distinct()
                 .toList();
     }
 
@@ -248,6 +248,12 @@ public class Utils {
             case UNIUSDT -> {
                 return CoinEnum.UNI;
             }
+            case WIFUSDT -> {
+                return CoinEnum.WIF;
+            }
+            case ENAUSDT -> {
+                return CoinEnum.ENA;
+            }
             default -> {
                 throw new IllegalArgumentException("Unsupported symbol: " + symbol);
             }
@@ -280,6 +286,22 @@ public class Utils {
                 .stream()
                 .map(ArrayList::new)
                 .collect(Collectors.toList());
+    }
+
+    public static Side inverse(Side side) {
+        return switch (side) {
+            case BUY -> Side.SELL;
+            case SELL -> Side.BUY;
+            default -> throw new IllegalArgumentException("Unsupported side: " + side);
+        };
+    }
+
+    public static String getWebSocketUrl(String baseUrl) {
+        return switch (baseUrl) {
+            case "https://api.bybit.com" -> BybitApiConfig.STREAM_MAINNET_DOMAIN;
+            case "https://api-demo.bybit.com" -> BybitApiConfig.DEMO_TRADING_STREAM_DOMAIN;
+            default -> throw new IllegalArgumentException("Unsupported base URL: " + baseUrl);
+        };
     }
 
 }

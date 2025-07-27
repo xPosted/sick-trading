@@ -1,24 +1,27 @@
 package com.crypto.sick.trade.config.schedulers;
 
-import com.bybit.api.client.domain.CategoryType;
 import com.crypto.sick.trade.data.user.*;
 import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
-import com.crypto.sick.trade.dto.enums.Symbol;
-import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.crypto.sick.trade.service.UserService;
 import com.crypto.sick.trade.service.action.ActionRouter;
-import com.crypto.sick.trade.service.strategy.*;
+import com.crypto.sick.trade.service.strategy.StrategyEvaluationParams;
+import com.crypto.sick.trade.service.strategy.StrategyEvaluationResult;
+import com.crypto.sick.trade.service.strategy.TradingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum.*;
 import static com.crypto.sick.trade.service.strategy.StrategyEvaluationParamsBuilder.buildStrategyEvaluationParams;
 
 @Configuration
@@ -31,16 +34,37 @@ public class TradingSchedulerConfiguration {
     @Autowired
     private ActionRouter actionRouter;
 
+    private final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+
     @Scheduled(fixedRateString = "${schedulers.tradeInterval}", timeUnit = TimeUnit.SECONDS, initialDelay = 70)
     public void tradeOrDie() {
-        userService.findAll()
-                .parallel()
-                .filter(UserStateEntity::isEnabled)
-                .map(this::tradeUser)
-                .forEach(userService::save);
+        cachedThreadPool.submit(() ->
+                userService.getUserNames().entrySet().stream()
+                        .parallel()
+                        .forEach(this::tradeUserFunction)
+        );
+    }
+
+    @PreDestroy
+    public void shutdownThreadPool() {
+        cachedThreadPool.shutdown();
+    }
+
+    private void tradeUserFunction(Map.Entry<String, ReentrantLock> entry) {
+        var name = entry.getKey();
+        var lock = entry.getValue();
+        lock.lock();
+        try {
+            userService.updateTransactionally(name, this::tradeUser);
+        } finally {
+            lock.unlock();
+        }
     }
 
     private UserStateEntity tradeUser(UserStateEntity userStateEntity) {
+        if (!userStateEntity.isEnabled()) {
+            return userStateEntity;
+        }
         var credentials = userStateEntity.getCredentials();
         var updatedCategoryStates = userStateEntity.getCategoryTradingStates().values().stream()
                 .map(categoryState -> tradeCategory(categoryState, credentials))
@@ -51,10 +75,12 @@ public class TradingSchedulerConfiguration {
     }
 
     private CategoryTradingState tradeCategory(CategoryTradingState categoryTradingState, CredentialsState credentials) {
-        var updatedSymbolTradingStates = categoryTradingState.getCoinTradingStates().values().stream()
-                .parallel()
-                .map(coinTradingState -> tradeSymbol(coinTradingState, credentials))
-                .collect(Collectors.toMap(CoinTradingState::getSymbol, coinTradingState -> coinTradingState));
+        var updatedSymbolTradingStates =
+                categoryTradingState.getCoinTradingStates().values().stream()
+                        .map(coinTradingState -> CompletableFuture.supplyAsync(() -> tradeSymbol(coinTradingState, credentials), cachedThreadPool))
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toMap(CoinTradingState::getSymbol, coinTradingState -> coinTradingState));
+
         return categoryTradingState.toBuilder()
                 .coinTradingStates(updatedSymbolTradingStates)
                 .build();

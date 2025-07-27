@@ -1,7 +1,10 @@
 package com.crypto.sick.trade.dto.web.bybit;
 
 import com.bybit.api.client.domain.trade.response.OrderResponse;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor

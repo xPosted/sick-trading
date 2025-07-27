@@ -7,10 +7,8 @@ import com.crypto.sick.trade.data.user.CredentialsState;
 import com.crypto.sick.trade.data.user.FlowState;
 import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
 import com.crypto.sick.trade.dto.enums.Symbol;
-import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.crypto.sick.trade.service.MarketRepository;
 import com.crypto.sick.trade.service.TradeOperationService;
-import com.crypto.sick.trade.service.strategy.StrategyEvaluationResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,7 +57,7 @@ public class LinearActionProcessor implements TradeAction {
             var orderContext = tradeOperationService.makeLongOperation(operationContext);
             return coinTradingState.forceStatus(flowType, SLEEPING, orderContext);
         }
-        return coinTradingState;
+        return coinTradingState.forceStatus(flowType, SLEEPING);
     }
 
     private CoinIntervalTradingState sellAction(CoinIntervalTradingState coinTradingState, FlowState flowState, CredentialsState credentials) {
@@ -70,9 +68,8 @@ public class LinearActionProcessor implements TradeAction {
             tradeOperationService.makeLongCloseOperation(operationContext);
             var orderContext =  tradeOperationService.makeShortOperation(operationContext);
             return coinTradingState.forceStatus(flowType, SLEEPING, orderContext);
-
         }
-        return coinTradingState;
+        return coinTradingState.forceStatus(flowType, SLEEPING);
     }
 
     private CoinIntervalTradingState sleepingAction(CoinIntervalTradingState coinTradingState) {
@@ -91,17 +88,11 @@ public class LinearActionProcessor implements TradeAction {
         switch (side) {
             case BUY -> {
                 var positions = tradeOperationService.getOpenPositions(credentials, CategoryType.LINEAR, symbol, Side.BUY);
-                var validationResult = positions.isEmpty();
-               //         || positions.stream().allMatch(p -> p.getAvgPrice() > currentPrice);
-                log.info("------- Validating existent orders for {}, side {}, allowed - {}", symbol, side, validationResult);
-                return validationResult;
+                return positions.isEmpty();
             }
             case SELL -> {
                 var positions = tradeOperationService.getOpenPositions(credentials, CategoryType.LINEAR, symbol, Side.SELL);
-                var validationResult = positions.isEmpty();
-                   //     || positions.stream().allMatch(p -> p.getAvgPrice() < currentPrice);
-                log.info("------- Validating existent orders for {}, side {}, allowed - {}", symbol, side, validationResult);
-                return validationResult;
+                return positions.isEmpty();
             }
             default -> throw new IllegalStateException("Unexpected value: " + side);
         }

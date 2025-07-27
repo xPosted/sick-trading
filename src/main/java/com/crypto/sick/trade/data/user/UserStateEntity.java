@@ -1,11 +1,13 @@
 package com.crypto.sick.trade.data.user;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBVersionAttribute;
 import com.bybit.api.client.domain.CategoryType;
 import com.crypto.sick.trade.data.converter.CoinBalancesConverter;
 import com.crypto.sick.trade.data.converter.MarketTradingStatesConverter;
 import com.crypto.sick.trade.dto.enums.CoinEnum;
 import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.util.Utils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbConvertedBy;
@@ -29,13 +31,13 @@ public class UserStateEntity {
 
     Long userId;
     String name;
+    Long version;
     @With
-    boolean enabled;
+    UserStatusEntity status;
     CredentialsState credentials;
 
     @Builder.Default
     Map<CategoryType, CategoryTradingState> categoryTradingStates = new HashMap<>();
-
 
     @Builder.Default
     @With
@@ -57,12 +59,20 @@ public class UserStateEntity {
         return coinBalances;
     }
 
-    public UserStateEntity withUpdatedMarketState(CategoryTradingState categoryTradingState) {
+    @DynamoDBVersionAttribute
+    public Long getVersion() { return version; }
+
+    public UserStateEntity withUpdatedCategory(CategoryTradingState categoryTradingState) {
         var updatedMarketStates = new HashMap<>(categoryTradingStates);
         updatedMarketStates.put(categoryTradingState.getCategory(), categoryTradingState);
         return this.toBuilder()
                 .categoryTradingStates(updatedMarketStates)
                 .build();
+    }
+
+    @JsonIgnore
+    public boolean isEnabled() {
+        return status.getStatus() != null && status.getStatus() == UserStatusEnum.ENABLED;
     }
 
     public CategoryTradingState getOrEmpty(CategoryType category) {
@@ -77,7 +87,7 @@ public class UserStateEntity {
     public UserStateEntity syncWalletAndAcquiredQty() {
         return Optional.ofNullable(categoryTradingStates.get(CategoryType.SPOT))
                 .map(this::syncWallet)
-                .map(this::withUpdatedMarketState)
+                .map(this::withUpdatedCategory)
                 .orElse(this);
     }
 

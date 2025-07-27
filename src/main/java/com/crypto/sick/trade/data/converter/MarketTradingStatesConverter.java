@@ -1,9 +1,7 @@
 package com.crypto.sick.trade.data.converter;
 
 import com.bybit.api.client.domain.CategoryType;
-import com.crypto.sick.trade.data.user.CoinTradingState;
 import com.crypto.sick.trade.data.user.CategoryTradingState;
-import com.crypto.sick.trade.dto.enums.Symbol;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.enhanced.dynamodb.AttributeConverter;

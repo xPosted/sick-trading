@@ -16,7 +16,10 @@ import com.crypto.sick.trade.config.external.AppConfig;
 import com.crypto.sick.trade.data.user.CredentialsState;
 import com.crypto.sick.trade.data.user.OrderResultInfo;
 import com.crypto.sick.trade.dto.enums.Symbol;
-import com.crypto.sick.trade.dto.web.bybit.*;
+import com.crypto.sick.trade.dto.web.bybit.OrderHistoryResponse;
+import com.crypto.sick.trade.dto.web.bybit.OrderInfoResult;
+import com.crypto.sick.trade.dto.web.bybit.PlaceOrderResponse;
+import com.crypto.sick.trade.dto.web.bybit.PositionsResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -45,32 +48,6 @@ public class OrderService {
 
     @Autowired
     private MeterRegistry meterRegistry;
-
-    /*
-    public PlaceOrderResponse placeOrder(CredentialsState credentials, CategoryType category, Symbol symbol, Side side, TradeOrderType orderType, String qty, String price, String orderLinkId) {
-        // Place order logic
-        BybitApiClientFactory factory = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl());
-        BybitApiTradeRestClient client = factory.newTradeRestClient();
-        Map<String, Object> order = Map.of(
-                "category", category.getCategoryTypeId(),
-                "symbol", symbol.getValue(),
-                "side", side.getTransactionSide(),
-                "orderType", orderType.getOType(),
-                "qty", qty,
-                "price", price,
-                "orderLinkId", orderLinkId
-        );
-        if (appConfig.isDebugMode()) {
-            log.info("------ Placing order:");
-            log.info(order.toString());
-            log.info("------ ");
-            return new PlaceOrderResponse(new OrderResponse());
-        }
-        var response = client.createOrder(order);
-        return objectMapper.convertValue(response, PlaceOrderResponse.class);
-    }
-
-     */
 
     public OrderResultInfo placeMarketOrder(CredentialsState credentials, CategoryType category, Symbol symbol, Side side, String qty, String orderLinkId) {
         // Place order logic
@@ -147,7 +124,7 @@ public class OrderService {
         if (placeOrderResponse.getRetCode() != 0) {
             log.error("Error placing order: {}", placeOrderResponse.getRetMsg());
         }
-        meterRegistry.counter("bybit.placeOrder","category", category.getCategoryTypeId(),"type", orderType.getOType(), "symbol", symbol.getValue(), "side", side.name(), "reduceOnly", String.valueOf(reduceOnly));
+        meterRegistry.counter("bybit.placeOrder","category", category.getCategoryTypeId(),"type", orderType.getOType(), "symbol", symbol.getValue(), "side", side.name(), "reduceOnly", String.valueOf(reduceOnly)).increment();
         return buildOrderResultInfo(placeOrderResponse, symbol, side, qty);
     }
 
@@ -160,7 +137,7 @@ public class OrderService {
                 .sellLeverage(sellLeverage.toString())
                 .build();
         client.setPositionLeverage(setLeverageRequest);
-        meterRegistry.counter("bybit.setLeverage", "symbol", symbol.getValue());
+        meterRegistry.counter("bybit.setLeverage", "symbol", symbol.getValue()).increment();
     }
 
     public OrderResult getOrderById(CredentialsState credentials, CategoryType categoryType, OrderResponse orderResponse) {
@@ -191,24 +168,23 @@ public class OrderService {
                 .category(categoryType)
                 .orderId(orderId)
                 .limit(1).build();
-        if (appConfig.isDebugMode()) {
-            return buildOrderInfoStub();
-        }
         var rawResponse = client.getOrderHistory(tradeHistoryRequest);
-        meterRegistry.counter("bybit.getOrderById");
+        meterRegistry.counter("bybit.getOrderById").increment();
         var responseWrapper = objectMapper.convertValue(rawResponse, OrderHistoryResponse.class);
         return responseWrapper.getResult();
     }
 
     public List<PositionsResponse.PositionDto> getOpenPositions(CredentialsState credentials, CategoryType categoryType, Symbol symbol) {
+        var symbolStr = symbol != null ? symbol.getValue() : null;
         var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl())
                 .newPositionRestClient();
         var positionListRequest = PositionDataRequest.builder()
                 .category(categoryType)
-                .symbol(symbol.getValue())
+                .symbol(symbolStr)
+                .settleCoin("USDT") // Assuming USDT for simplicity, adjust as needed
                 .build();
         var rawResponse = client.getPositionInfo(positionListRequest);
-        meterRegistry.counter("bybit.getPositionInfo", "category", categoryType.getCategoryTypeId(), "symbol", symbol.getValue());
+        meterRegistry.counter("bybit.getPositionInfo", "category", categoryType.getCategoryTypeId()).increment();
         var responseWrapper = objectMapper.convertValue(rawResponse, PositionsResponse.class);
         return Optional.ofNullable(responseWrapper.getResult())
                 .map(PositionsResponse.PositionsCategoryWrapper::getPositions)
@@ -244,14 +220,14 @@ public class OrderService {
                 .stopOrderType(StopOrderType.STOP)
                 .build();
         log.info(client.cancelAllOrder(cancelAllOrdersRequest).toString());
-        meterRegistry.counter("bybit.cancelAllOrders", "category", category.getCategoryTypeId(), "symbol", symbol.getValue());
+        meterRegistry.counter("bybit.cancelAllOrders", "category", category.getCategoryTypeId(), "symbol", symbol.getValue()).increment();;
     }
 
     public void getOpenOrders(CredentialsState credentials, CategoryType category, Symbol symbol) {
         var client = BybitApiClientFactory.newInstance(credentials.getKey(), credentials.getSecret(), credentials.getBaseUrl()).newTradeRestClient();
         var openLinearOrdersResult = client.getOpenOrders(TradeOrderRequest.builder().category(category).symbol(symbol.getValue()).openOnly(0).build());
         log.info(openLinearOrdersResult.toString());
-        meterRegistry.counter("bybit.getOpenOrders", "category", category.getCategoryTypeId(), "symbol", symbol.getValue());
+        meterRegistry.counter("bybit.getOpenOrders", "category", category.getCategoryTypeId(), "symbol", symbol.getValue()).increment();
     }
 
     public void switchPositionMode(CredentialsState credentials, CategoryType category, Symbol symbol, PositionMode positionMode) {
@@ -262,44 +238,7 @@ public class OrderService {
                 .positionMode(positionMode)
                 .build();
         log.info("Switch position response: " + client.switchPositionMode(switchPositionMode));
-        meterRegistry.counter("bybit.switchPositionMode", "category", category.getCategoryTypeId(), "symbol", symbol.getValue(), "positionMode", positionMode.name());
-    }
-
-    private static OrderInfoResult buildOrderInfoStub() {
-        return OrderInfoResult.builder()
-                .orderEntries(List.of(buildStub()))
-                .build();
-    }
-
-    private static OrderInfoEntry buildStub() {
-        return OrderInfoEntry.builder()
-                .orderId("123")
-                .orderLinkId("123")
-                .blockTradeId("123")
-                .symbol("BTCUSD")
-                .price("123")
-                .qty("123")
-                .side("BUY")
-                .isLeverage("123")
-                .orderStatus(null)
-                .rejectReason(null)
-                .avgPrice("123")
-                .leavesQty("123")
-                .leavesValue("123")
-                .cumExecQty(1D)
-                .cumExecValue("123")
-                .cumExecFee(123)
-                .timeInForce(null)
-                .orderType("123")
-                .takeProfit("123")
-                .stopLoss("123")
-                .tpslMode("123")
-                .tpLimitPrice("123")
-                .slLimitPrice("123")
-                .lastPriceOnCreated("123")
-                .createdTime("123")
-                .updatedTime("123")
-                .build();
+        meterRegistry.counter("bybit.switchPositionMode", "category", category.getCategoryTypeId(), "symbol", symbol.getValue(), "positionMode", positionMode.name()).increment();
     }
 
 }

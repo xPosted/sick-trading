@@ -1,6 +1,5 @@
 package com.crypto.sick.trade.dto.web.taapi;
 
-import com.crypto.sick.trade.dto.enums.TaapiIndicatorEnum;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

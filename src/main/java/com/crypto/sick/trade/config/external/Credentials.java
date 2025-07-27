@@ -1,11 +1,9 @@
 package com.crypto.sick.trade.config.external;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.lang.reflect.MalformedParameterizedTypeException;
 import java.util.Map;
 import java.util.Optional;
 

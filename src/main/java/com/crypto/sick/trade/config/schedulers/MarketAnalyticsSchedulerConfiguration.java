@@ -2,8 +2,12 @@ package com.crypto.sick.trade.config.schedulers;
 
 import com.crypto.sick.trade.config.external.AppConfig;
 import com.crypto.sick.trade.dto.MarketLinesInfo;
-import com.crypto.sick.trade.dto.enums.*;
-import com.crypto.sick.trade.dto.state.*;
+import com.crypto.sick.trade.dto.enums.PercentileEnum;
+import com.crypto.sick.trade.dto.enums.Symbol;
+import com.crypto.sick.trade.dto.enums.TaapiExchangeEnum;
+import com.crypto.sick.trade.dto.state.MarketPercentile;
+import com.crypto.sick.trade.dto.state.MarketState;
+import com.crypto.sick.trade.dto.state.PercentileValues;
 import com.crypto.sick.trade.dto.web.bybit.MarketLinesResponse;
 import com.crypto.sick.trade.dto.web.taapi.TaapiIndicatorResult;
 import com.crypto.sick.trade.service.MarketRepository;
@@ -17,12 +21,12 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static com.crypto.sick.trade.dto.enums.TaapiIntervalEnum.*;
 import static com.crypto.sick.trade.util.Utils.*;
 
 @Configuration

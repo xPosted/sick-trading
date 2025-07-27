@@ -2,10 +2,13 @@ package com.crypto.sick.trade.service.strategy;
 
 import com.crypto.sick.trade.data.user.CoinIntervalTradingState;
 import com.crypto.sick.trade.data.user.FlowState;
+import com.crypto.sick.trade.data.user.OrderContext;
 import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
 import com.crypto.sick.trade.dto.enums.StrategyEnum;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 public class StrategyEvaluationParamsBuilder {
 
@@ -42,7 +45,7 @@ public class StrategyEvaluationParamsBuilder {
                     .interval(coinIntervalTradingState.getInterval())
                     .strategyState(strategyState)
                     .symbol(coinIntervalTradingState.getSymbol())
-                    .lastOrder(coinIntervalTradingState.getLastSuccessfulOrderHistoryItem(FlowTypeEnum.MAIN_FLOW))
+                    .lastOrders(getLastOrders(coinIntervalTradingState))
                     .takeProfit(flowState.getTakeProfit())
                     .stopLoss(flowState.getStopLoss())
                     .build();
@@ -51,7 +54,7 @@ public class StrategyEvaluationParamsBuilder {
                     .interval(coinIntervalTradingState.getInterval())
                     .strategyState(strategyState)
                     .symbol(coinIntervalTradingState.getSymbol())
-                    .lastOrder(coinIntervalTradingState.getLastSuccessfulOrderHistoryItem(FlowTypeEnum.MAIN_FLOW))
+                    .lastOrders(getLastOrders(coinIntervalTradingState))
                     .isAvailableToSell(coinIntervalTradingState::isAvailableToOverTake)
                     .isAvailableToBuy(coinIntervalTradingState::isAvailableToOverTake)
                     .takeProfit(flowState.getTakeProfit())
@@ -66,6 +69,14 @@ public class StrategyEvaluationParamsBuilder {
                     .stopLoss(flowState.getStopLoss())
                     .build();
         };
+    }
+
+    private static List<OrderContext> getLastOrders(CoinIntervalTradingState coinIntervalTradingState) {
+        return EnumSet.allOf(FlowTypeEnum.class)
+                .stream()
+                .map(coinIntervalTradingState::getLastSuccessfulOrderHistoryItem)
+                .flatMap(Optional::stream)
+                .toList();
     }
 
 }

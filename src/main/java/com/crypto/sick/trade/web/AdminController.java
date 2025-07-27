@@ -2,24 +2,24 @@ package com.crypto.sick.trade.web;
 
 import com.bybit.api.client.domain.CategoryType;
 import com.crypto.sick.trade.data.user.OrderContext;
-import com.crypto.sick.trade.data.user.StrategyState;
 import com.crypto.sick.trade.data.user.UserStateEntity;
-import com.crypto.sick.trade.dto.enums.*;
+import com.crypto.sick.trade.data.user.UserStatusEntity;
+import com.crypto.sick.trade.data.user.UserStatusEnum;
+import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
+import com.crypto.sick.trade.dto.enums.Symbol;
+import com.crypto.sick.trade.dto.enums.TaapiIntervalEnum;
+import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.crypto.sick.trade.dto.state.MarketState;
 import com.crypto.sick.trade.dto.web.*;
 import com.crypto.sick.trade.service.MarketRepository;
 import com.crypto.sick.trade.service.TradeOperationService;
 import com.crypto.sick.trade.service.UserService;
 import com.crypto.sick.trade.service.action.ActionRouter;
-import com.crypto.sick.trade.service.strategy.StrategyEvaluationResult;
-import com.google.common.base.Functions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.crypto.sick.trade.dto.enums.FlowTypeEnum.MAIN_FLOW;
 
 @RestController
 @RequestMapping("/admin")
@@ -63,9 +63,9 @@ public class AdminController {
     }
 
     @PostMapping(value = "/user/status", produces = "application/json")
-    public UserStateInfo getUserState(@RequestParam String user, @RequestParam boolean enabled) {
+    public UserStateInfo setStatus(@RequestParam String user, @RequestParam UserStatusEnum status) {
         var state = userService.findByName(user).orElseThrow(() -> new RuntimeException("User state is not available"));
-        var updatedState = state.withEnabled(enabled);
+        var updatedState = state.withStatus(UserStatusEntity.of(status));
         userService.save(updatedState);
         var marketStates = marketRepository.getMarketStates().collect(Collectors.toList());
         return UserStateInfo.map(updatedState, marketStates);
@@ -95,7 +95,7 @@ public class AdminController {
         var updatedIntervalState = actionRouter.processAction(coinIntervalTradingState.updateStatus(flow, tradingStateType), userState.getCredentials());
         var updatedCoinState = coinTradingState.withUpdatedIntervalState(interval, updatedIntervalState);
         var updatedCategoryState = categoryTradingState.withUpdatedCoinState(symbol, updatedCoinState);
-        var updatedUserState = userState.withUpdatedMarketState(updatedCategoryState);
+        var updatedUserState = userState.withUpdatedCategory(updatedCategoryState);
         userService.save(updatedUserState);
         return updatedIntervalState
                 .getLastSuccessfulOrderHistoryItem(flow)
@@ -114,7 +114,7 @@ public class AdminController {
                 .build();
         var updatedCoinState = coinTradingState.withUpdatedIntervalState(interval, updatedCoinIntervalTradingState);
         var updatedCategoryState = categoryTradingState.withUpdatedCoinState(symbol, updatedCoinState);
-        return userStateEntity.withUpdatedMarketState(updatedCategoryState);
+        return userStateEntity.withUpdatedCategory(updatedCategoryState);
     }
 
 }

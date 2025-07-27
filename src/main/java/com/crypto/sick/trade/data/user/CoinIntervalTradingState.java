@@ -2,12 +2,20 @@ package com.crypto.sick.trade.data.user;
 
 import com.bybit.api.client.domain.CategoryType;
 import com.bybit.api.client.domain.trade.Side;
-import com.crypto.sick.trade.dto.enums.*;
+import com.bybit.api.client.domain.trade.StopOrderType;
+import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
+import com.crypto.sick.trade.dto.enums.Symbol;
+import com.crypto.sick.trade.dto.enums.TaapiIntervalEnum;
+import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,7 +23,8 @@ import static com.bybit.api.client.domain.trade.Side.BUY;
 import static com.bybit.api.client.domain.trade.Side.SELL;
 import static com.crypto.sick.trade.dto.enums.FlowTypeEnum.MAIN_FLOW;
 import static com.crypto.sick.trade.dto.enums.FlowTypeEnum.OVERTAKE_FLOW;
-import static com.crypto.sick.trade.util.Utils.*;
+import static com.crypto.sick.trade.util.Utils.FIVE_POINT_THREE;
+import static com.crypto.sick.trade.util.Utils.ZERO;
 import static java.util.Objects.nonNull;
 
 @Data
@@ -34,9 +43,7 @@ public class CoinIntervalTradingState {
     double buyAmount;
     double sellAmount;
     int leverage;
-    //   double tradeOffset;
     int stopLossTimeout;
-
     @Builder.Default
     Set<OrderContext> orderHistory = new HashSet<>();
 
@@ -67,7 +74,7 @@ public class CoinIntervalTradingState {
                 .build();
     }
 
-    public CoinIntervalTradingState closeLastSuccessfulPosition(Side side, FlowTypeEnum flowType) {
+    public CoinIntervalTradingState closeLastSuccessfulPosition(Side side, FlowTypeEnum flowType, StopOrderType stopOrderType) {
         var lastSuccessfulShortPosOptional = getLastSuccessfulOrderHistoryItem(flowType)
                 .filter(o -> o.getSide().equals(side));
         if (lastSuccessfulShortPosOptional.isEmpty()) {
@@ -79,7 +86,11 @@ public class CoinIntervalTradingState {
                 .filter(o -> nonNull(o.getOrderId()))
                 .filter(o -> !o.getOrderId().equals(lastSuccessfulShortPos.getOrderId()))
                 .collect(Collectors.toSet());
-        updatedOrders.add(lastSuccessfulShortPos.withClosed(true));
+        updatedOrders.add(
+                lastSuccessfulShortPos
+                        .withClosed(true)
+                        .withStopOrderType(stopOrderType)
+                        .withStopOrderTs(Instant.now().toEpochMilli()));
         return toBuilder()
                 .orderHistory(updatedOrders)
                 .build();
@@ -139,7 +150,7 @@ public class CoinIntervalTradingState {
             case LINEAR: {
                 return lastOrder.isEmpty() ||
                         lastOrder.filter(OrderContext::isShortOperationType).isPresent() ||
-                        lastOrder.filter(OrderContext::isOlderThanLast6Hours).isPresent();
+                        lastOrder.filter(OrderContext::isOlderThanLast3Hours).isPresent();
             }
             default:
                 throw new IllegalArgumentException("Unknown category: " + category);
@@ -160,7 +171,7 @@ public class CoinIntervalTradingState {
                 var lastOrder = getLastSuccessfulOrderHistoryItem(MAIN_FLOW);
                 return lastOrder.isEmpty() ||
                         lastOrder.filter(OrderContext::isLongOperationType).isPresent() ||
-                        lastOrder.filter(OrderContext::isOlderThanLast6Hours).isPresent();
+                        lastOrder.filter(OrderContext::isOlderThanLast3Hours).isPresent();
             }
             default:
                 throw new IllegalArgumentException("Unknown category: " + category);

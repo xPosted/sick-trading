@@ -1,9 +1,8 @@
 package com.crypto.sick.trade.dto.web.bybit;
 
 
-import com.bybit.api.client.domain.TriggerBy;
-import com.bybit.api.client.domain.trade.*;
-import com.crypto.sick.trade.dto.enums.Symbol;
+import com.bybit.api.client.domain.trade.RejectReason;
+import com.bybit.api.client.domain.trade.TimeInForce;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

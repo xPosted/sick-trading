@@ -4,11 +4,11 @@ import com.bybit.api.client.domain.CategoryType;
 import com.bybit.api.client.domain.TradeOrderType;
 import com.bybit.api.client.domain.position.PositionMode;
 import com.bybit.api.client.domain.trade.Side;
-import com.crypto.sick.trade.data.user.CoinIntervalTradingState;
-import com.crypto.sick.trade.data.user.CredentialsState;
-import com.crypto.sick.trade.data.user.FlowState;
-import com.crypto.sick.trade.data.user.OrderContext;
-import com.crypto.sick.trade.dto.enums.*;
+import com.crypto.sick.trade.data.user.*;
+import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
+import com.crypto.sick.trade.dto.enums.StrategyEnum;
+import com.crypto.sick.trade.dto.enums.Symbol;
+import com.crypto.sick.trade.dto.enums.TaapiIntervalEnum;
 import com.crypto.sick.trade.dto.state.MarketState;
 import com.crypto.sick.trade.dto.web.bybit.PositionsResponse;
 import lombok.AllArgsConstructor;
@@ -20,10 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bybit.api.client.domain.CategoryType.LINEAR;
@@ -73,7 +70,6 @@ public class TradeOperationService {
 
         var resultQty = getPercentageOf(sellAmount, acquiredQty, symbol.getSpotScale());
         var orderResultInfo = orderService.placeMarketOrder(credentials, SPOT, symbol, Side.SELL, resultQty.toString(), UUID.randomUUID().toString());
-        log.info("Sell operation: " + orderResultInfo);
         var orderInfoResult = orderService.getOrderById(credentials, SPOT, orderResultInfo.getOrderResponse().getOrderId());
         return OrderContext.buildOrderContext(flowType, orderResultInfo, orderInfoResult, rsiValue, mfiValue, lastPrice.doubleValue(), SELL_OPERATION);
     }
@@ -115,7 +111,6 @@ public class TradeOperationService {
                 .map(slValue -> lastPrice.add(BigDecimal.valueOf(getPercentageOf(slValue, lastPrice.doubleValue(), lastPrice.scale()))))
                 .map(BigDecimal::toString)
                 .orElse(null);
-        log.info("Take profit: " + takeProfitPrice + " Stop loss: " + stopLossPrice + "tp: " + tp + " sl: " + sl);
         var orderResultInfo = orderService.placeMarketOrder2(credentials, LINEAR, symbol, SELL, qty.toString(), "SHORT_OPEN_ORDER_" + new Random().nextInt(), takeProfitPrice, stopLossPrice, null, null);
         var orderInfoResult = orderService.getOrderById(credentials, LINEAR, orderResultInfo.getOrderResponse().getOrderId());
         return OrderContext.buildOrderContext(flowType, orderResultInfo, orderInfoResult, rsiValue, mfiValue, lastPrice.doubleValue(), SHORT_OPERATION);
@@ -205,7 +200,6 @@ public class TradeOperationService {
                 .map(slValue ->  lastPrice.subtract(BigDecimal.valueOf(getPercentageOf(slValue, lastPrice.doubleValue(), lastPrice.scale()))))
                 .map(BigDecimal::toString)
                 .orElse(null);
-        log.info("Take profit: " + takeProfitPrice + " Stop loss: " + stopLossPrice + "tp: " + tp + " sl: " + sl);
         var orderResultInfo = orderService.placeMarketOrder2(credentials, LINEAR, symbol, BUY, qty.toString(), "LONG_OPEN_ORDER_" + new Random().nextInt(), takeProfitPrice, stopLossPrice, null, null);
         var orderInfoResult = orderService.getOrderById(credentials, LINEAR, orderResultInfo.getOrderResponse().getOrderId());
         return OrderContext.buildOrderContext(flowType, orderResultInfo, orderInfoResult, rsiValue, mfiValue, lastPrice.doubleValue(), LONG_OPERATION);
@@ -241,6 +235,30 @@ public class TradeOperationService {
 
     public void setHedgePositionMode(CredentialsState credentials, CategoryType categoryType, Symbol symbol) {
         orderService.switchPositionMode(credentials, categoryType, symbol, PositionMode.BOTH_SIDES);
+    }
+
+    public void closeAllOpenPositions(UserStateEntity userStateEntity) {
+        var openedPositions = userStateEntity.getCategoryTradingStates().values().stream()
+                .flatMap(categoryTradingState -> categoryTradingState.getCoinTradingStates().values().stream())
+                .flatMap(coinTradingState -> coinTradingState.getIntervalStates().values().stream())
+                .flatMap(intervalState -> intervalState.getLastSuccessfulOrderHistoryItem(FlowTypeEnum.MAIN_FLOW).stream())
+                .filter(order -> ! order.isClosed())
+                .collect(Collectors.groupingBy(OrderContext::getSide, Collectors.toSet()));
+        var symbolsPerSide = openedPositions.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        entry -> entry.getValue().stream().map(OrderContext::getSymbol).collect(Collectors.toSet())));
+        var credentials = userStateEntity.getCredentials();
+        symbolsPerSide.forEach((side, symbols) -> {
+            switch (side) {
+                case BUY -> symbols.forEach(symbol -> {
+                    orderService.placeMarketOrder2(credentials, LINEAR, symbol, SELL, "0", "LONG_CLOSE_ORDER_" + new Random().nextInt(), null, null, true, true);
+                });
+                case SELL -> symbols.forEach(symbol -> {
+                    orderService.placeMarketOrder2(credentials, LINEAR, symbol, BUY, "0", "SHORT_CLOSE_ORDER_" + new Random().nextLong(), null, null, true, true);
+                });
+                default -> log.warn("Unknown side: " + side);
+            }
+        });
     }
 
     public void testShortLinearOrder(CredentialsState credentials) {

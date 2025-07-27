@@ -1,8 +1,8 @@
 package com.crypto.sick.trade.dto.web;
 
+import com.crypto.sick.trade.data.user.CoinTradingState;
 import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.dto.enums.TaapiIntervalEnum;
-import com.crypto.sick.trade.data.user.CoinTradingState;
 import lombok.Builder;
 import lombok.Data;
 

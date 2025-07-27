@@ -6,18 +6,14 @@ import com.crypto.sick.trade.data.user.CredentialsState;
 import com.crypto.sick.trade.data.user.FlowState;
 import com.crypto.sick.trade.data.user.OrderContext;
 import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
-import com.crypto.sick.trade.dto.enums.Symbol;
-import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.crypto.sick.trade.dto.state.MarketState;
 import com.crypto.sick.trade.service.MarketRepository;
 import com.crypto.sick.trade.service.TradeOperationService;
-import com.crypto.sick.trade.service.strategy.StrategyEvaluationResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.concurrent.Flow;
 
 import static com.bybit.api.client.domain.trade.Side.BUY;
 import static com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum.*;

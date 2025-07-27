@@ -87,7 +87,9 @@ public enum CoinEnum {
     DARK("DARK"),
     BANK("BANK"),
     HAEDAL("HAEDAL"),
-    SYRUP("SYRUP");
+    SYRUP("SYRUP"),
+    WIF("WIF"),
+    ENA("ENA");
 
 
     private final String coin;

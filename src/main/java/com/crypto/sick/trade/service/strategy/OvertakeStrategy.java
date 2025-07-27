@@ -1,12 +1,11 @@
 package com.crypto.sick.trade.service.strategy;
 
+import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
 import com.crypto.sick.trade.dto.enums.StrategyEnum;
 import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.crypto.sick.trade.service.MarketRepository;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Optional;
 
 import static com.crypto.sick.trade.util.Utils.getPercentageOf;
 import static java.math.BigDecimal.valueOf;
@@ -44,8 +43,11 @@ public class OvertakeStrategy implements TradingStrategy {
         var marketState = marketRepository.getMarketState(symbol);
         var price = marketState.getLastPrice();
         var priceOffset = getPercentageOf(strategyState.getPriceOffset(), price, valueOf(price).scale());
+        var mainFlowLastOrder = evaluationParams.getLastOrders().stream()
+                .filter(order -> order.getFlowType().equals(FlowTypeEnum.MAIN_FLOW))
+                .findAny();
 
-        return evaluationParams.getLastOrder()
+        return mainFlowLastOrder
                 .filter(orderContext -> ! orderContext.isOlderThanLast12Hours())
                 .filter(orderContext -> ! orderContext.isClosed())
                 .map(orderContext -> {

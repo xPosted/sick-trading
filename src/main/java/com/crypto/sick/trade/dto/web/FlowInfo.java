@@ -1,7 +1,6 @@
 package com.crypto.sick.trade.dto.web;
 
 import com.crypto.sick.trade.data.user.FlowState;
-import com.crypto.sick.trade.data.user.StrategyState;
 import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
 import com.crypto.sick.trade.dto.enums.StrategyEnum;
 import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;

@@ -1,9 +1,8 @@
 package com.crypto.sick.trade.dto.web;
 
 import com.bybit.api.client.domain.CategoryType;
-import com.crypto.sick.trade.dto.enums.CoinEnum;
-import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.data.user.UserStateEntity;
+import com.crypto.sick.trade.dto.enums.CoinEnum;
 import com.crypto.sick.trade.dto.state.MarketState;
 import lombok.Builder;
 import lombok.Data;

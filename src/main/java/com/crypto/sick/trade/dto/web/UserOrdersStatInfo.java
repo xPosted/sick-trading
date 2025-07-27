@@ -1,11 +1,10 @@
 package com.crypto.sick.trade.dto.web;
 
 import com.crypto.sick.trade.data.user.CategoryTradingState;
-import com.crypto.sick.trade.dto.enums.OrderOperationTypeEnum;
-import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.data.user.CoinIntervalTradingState;
 import com.crypto.sick.trade.data.user.CoinTradingState;
-import com.crypto.sick.trade.data.user.UserStateEntity;
+import com.crypto.sick.trade.dto.enums.OrderOperationTypeEnum;
+import com.crypto.sick.trade.dto.enums.Symbol;
 import lombok.Builder;
 import lombok.Data;
 

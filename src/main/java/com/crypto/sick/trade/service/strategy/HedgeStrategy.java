@@ -1,13 +1,12 @@
 package com.crypto.sick.trade.service.strategy;
 
 import com.crypto.sick.trade.config.external.AppConfig;
+import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
 import com.crypto.sick.trade.dto.enums.StrategyEnum;
 import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.crypto.sick.trade.service.MarketRepository;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.math.BigDecimal;
 
 import static com.crypto.sick.trade.util.Utils.getPercentageOf;
 import static java.math.BigDecimal.valueOf;
@@ -51,9 +50,24 @@ public class HedgeStrategy implements TradingStrategy{
         var price = marketState.getLastPrice();
         var takeProfit = evaluationParams.getTakeProfit();
         var priceInitialOffset = getPercentageOf(strategyState.getPriceOffset(), price, valueOf(price).scale());
+        var mainFlowLastOrder = evaluationParams.getLastOrders().stream()
+                .filter(order -> order.getFlowType().equals(FlowTypeEnum.MAIN_FLOW))
+                .findAny();
+        var hedgeFlowLastOrder = evaluationParams.getLastOrders().stream()
+                .filter(order -> order.getFlowType().equals(FlowTypeEnum.HEDGE_FLOW))
+                .findAny();
 
-        return evaluationParams.getLastOrder()
-                .filter(orderContext -> ! orderContext.isOlderThanLast12Hours())
+        if (hedgeFlowLastOrder
+                .filter(order -> ! order.isOlderThanLast3Hours())
+                .isPresent())
+        {
+            return StrategyEvaluationResult.builder()
+                    .strategy(strategyName)
+                    .tradingStatus(TradingStrategyStatusEnum.SLEEPING)
+                    .build();
+        }
+        return mainFlowLastOrder
+                .filter(orderContext -> ! orderContext.isOlderThanLast3Hours())
                 .map(orderContext -> {
                     switch (orderContext.getSide()) {
                         case BUY -> {

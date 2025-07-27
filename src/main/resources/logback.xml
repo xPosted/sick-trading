@@ -21,4 +21,5 @@
     <logger name="com.crypto.sick.trade.config.schedulers.ConsoleLogSchedulerConfiguration" level="info" additivity="false">
         <appender-ref ref="CUSTOM_CONSOLE" />
     </logger>
+    <logger name="com.bybit.api.client.WebsocketStreamClientImpl" level="OFF"/>
 </configuration>

@@ -3,13 +3,9 @@ package com.crypto.sick.trade.service;
 import com.bybit.api.client.config.BybitApiConfig;
 import com.bybit.api.client.domain.websocket_message.public_channel.WebSocketTickerMessage;
 import com.bybit.api.client.service.BybitApiClientFactory;
-import com.crypto.sick.trade.config.external.AppConfig;
 import com.crypto.sick.trade.dto.enums.Symbol;
-import com.crypto.sick.trade.util.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.WebSocket;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;

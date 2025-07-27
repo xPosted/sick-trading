@@ -2,6 +2,7 @@ package com.crypto.sick.trade.config.schedulers;
 
 import com.bybit.api.client.domain.market.MarketInterval;
 import com.crypto.sick.trade.config.external.AppConfig;
+import com.crypto.sick.trade.data.user.UserStateEntity;
 import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.dto.state.MarketPercentile;
 import com.crypto.sick.trade.dto.state.MarketState;
@@ -33,6 +34,25 @@ public class ConsoleLogSchedulerConfiguration {
     public void printMarketAnalytics() {
         log.info("------------ User Orders ------------");
 
+        userService.findAll()
+                .filter(UserStateEntity::isEnabled)
+                .forEach(userState -> {
+                    log.info("User: {}", userState.getName());
+                    userState.getCategoryTradingStates().forEach((category, categoryTradingState) -> {
+                        log.info("\tCategory: {}", category);
+                        categoryTradingState.getCoinTradingStates().forEach((symbol, coinTradingState) -> {
+                            log.info("\t\tSymbol: {}", symbol);
+                            coinTradingState.getIntervalStates().forEach((interval, state) -> {
+                                log.info("\t\t\t {}", interval);
+                                log.info("\t\t\t\t{}", state.getOrderHistory());
+                            });
+                        });
+                    });
+                });
+
+        log.info("------------  ------------");
+        log.info("------------ User Flow States ------------");
+
         userService.findAll().forEach(userState -> {
             log.info("User: {}", userState.getName());
             userState.getCategoryTradingStates().forEach((category, categoryTradingState) -> {
@@ -41,7 +61,9 @@ public class ConsoleLogSchedulerConfiguration {
                     log.info("\t\tSymbol: {}", symbol);
                     coinTradingState.getIntervalStates().forEach((interval, state) -> {
                         log.info("\t\t\t {}", interval);
-                        log.info("\t\t\t\t{}", state.getOrderHistory());
+                        state.getFlowStates().values().forEach(flowState -> {
+                            log.info("\t\t\t\t{}", flowState);
+                        });
                     });
                 });
             });
@@ -53,28 +75,11 @@ public class ConsoleLogSchedulerConfiguration {
         marketRepository.getSymbols().stream()
                 .map(Symbol::valueOf)
                 .forEach(symbol -> {
-                    log.info("Symbol: {}", symbol);
+                            log.info("Symbol: {}", symbol);
                             printMarketAnalytics(marketRepository.getMarketState(symbol));
                         }
                 );
         log.info("------------  ------------\n");
-        log.info("------------ User Flow States ------------");
-
-        userService.findAll().forEach(userState -> {
-            log.info("User: {}", userState.getName());
-            userState.getCategoryTradingStates().forEach((category, categoryTradingState) -> {
-                log.info("\tCategory: {}", category);
-                categoryTradingState.getCoinTradingStates().forEach((symbol, coinTradingState) -> {
-                    log.info("\t\tSymbol: {}", symbol);
-                    coinTradingState.getIntervalStates().forEach((interval, state) -> {
-                        log.info("\t\t\t {}", interval);
-                        state.getFlowStates().values().forEach(flowState -> {log.info("\t\t\t\t{}", flowState);});
-                    });
-                });
-            });
-        });
-
-        log.info("------------  ------------");
     }
 
     private void printMarketAnalytics(MarketState marketState) {

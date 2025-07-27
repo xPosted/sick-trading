@@ -1,5 +1,6 @@
 package com.crypto.sick.trade.dto.web.bybit;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -7,16 +8,19 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WalletResponse extends ByBitApiResponse {
 
     private Result result;
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Result {
         private List<Account> list;
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Account {
         private double totalEquity;
         private double accountIMRate;
@@ -33,6 +37,7 @@ public class WalletResponse extends ByBitApiResponse {
     }
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Coin {
         private String availableToBorrow;
         private double bonus;

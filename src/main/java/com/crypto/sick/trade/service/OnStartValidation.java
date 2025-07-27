@@ -12,15 +12,15 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
+import static com.crypto.sick.trade.data.user.UserStatusEntity.of;
+import static com.crypto.sick.trade.data.user.UserStatusEnum.DISABLED;
 import static com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum.SLEEPING;
 import static com.crypto.sick.trade.util.Utils.getInitialStatus;
 
@@ -47,6 +47,11 @@ public class OnStartValidation {
         // validateWallets();
         resetSettings();
         createEmptyMarketStates();
+        resetUserList();
+    }
+
+    private void resetUserList() {
+        userService.initUserNames();
     }
 
     private void validateWallets() {
@@ -96,9 +101,7 @@ public class OnStartValidation {
     }
 
     private UserStateEntity disableUser(UserStateEntity userStateEntity) {
-        return userStateEntity.toBuilder()
-                .enabled(false)
-                .build();
+        return userStateEntity.withStatus(of(DISABLED));
     }
 
 
@@ -148,7 +151,7 @@ public class OnStartValidation {
         return stateEntity.toBuilder()
                 .categoryTradingStates(buildCategoryTradingStates(stateEntity, userTradeConfig))
                 .credentials(CredentialsState.from(validateCredentials(userTradeConfig.getName())))
-                .enabled(userTradeConfig.isEnabled())
+                .status(of(userTradeConfig.getStatus()))
                 .build();
     }
 

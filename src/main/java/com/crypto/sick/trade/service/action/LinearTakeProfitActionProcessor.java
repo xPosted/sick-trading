@@ -1,6 +1,7 @@
 package com.crypto.sick.trade.service.action;
 
 import com.bybit.api.client.domain.trade.Side;
+import com.bybit.api.client.domain.trade.StopOrderType;
 import com.crypto.sick.trade.data.user.CoinIntervalTradingState;
 import com.crypto.sick.trade.data.user.CredentialsState;
 import com.crypto.sick.trade.data.user.FlowState;
@@ -52,7 +53,7 @@ public class LinearTakeProfitActionProcessor implements TradeAction {
         var operationContext = new TradeOperationService.OperationContext(coinTradingState, flowState, credentials, targetMarketState);
         tradeOperationService.makeShortCloseOperation(operationContext);
         return coinTradingState
-                .closeLastSuccessfulPosition(Side.SELL, FlowTypeEnum.MAIN_FLOW)
+                .closeLastSuccessfulPosition(Side.SELL, FlowTypeEnum.MAIN_FLOW, StopOrderType.TRAILING_STOP)
                 .forceStatus(flowType, TradingStrategyStatusEnum.SLEEPING);
     }
 
@@ -63,7 +64,7 @@ public class LinearTakeProfitActionProcessor implements TradeAction {
         var operationContext = new TradeOperationService.OperationContext(coinTradingState, flowState, credentials, targetMarketState);
         tradeOperationService.makeLongCloseOperation(operationContext);
         return coinTradingState
-                .closeLastSuccessfulPosition(Side.BUY, FlowTypeEnum.MAIN_FLOW)
+                .closeLastSuccessfulPosition(Side.BUY, FlowTypeEnum.MAIN_FLOW, StopOrderType.TRAILING_STOP)
                 .forceStatus(flowType, TradingStrategyStatusEnum.SLEEPING);
     }
 

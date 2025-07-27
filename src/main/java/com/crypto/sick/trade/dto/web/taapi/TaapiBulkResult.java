@@ -6,7 +6,6 @@ import com.crypto.sick.trade.dto.enums.TaapiIndicatorEnum;
 import com.crypto.sick.trade.dto.enums.TaapiIntervalEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
-import lombok.Singular;
 import lombok.Value;
 
 import java.util.HashMap;

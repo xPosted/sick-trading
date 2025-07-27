@@ -1,11 +1,12 @@
 package com.crypto.sick.trade.data.user;
 
 import com.bybit.api.client.domain.trade.Side;
+import com.bybit.api.client.domain.trade.StopOrderType;
 import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
 import com.crypto.sick.trade.dto.enums.OrderOperationTypeEnum;
+import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.dto.web.bybit.OrderInfoEntry;
 import com.crypto.sick.trade.dto.web.bybit.OrderInfoResult;
-import com.crypto.sick.trade.util.Utils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
@@ -25,6 +26,11 @@ public class OrderContext {
     @With
     @Builder.Default
     boolean closed = false;
+    @With
+    StopOrderType stopOrderType;
+    @With
+    long stopOrderTs;
+
 
     @JsonIgnore
     public Double getAcquiredQty() {
@@ -82,13 +88,33 @@ public class OrderContext {
     }
 
     @JsonIgnore
+    public boolean isOlderThanLast3Hours() {
+        return System.currentTimeMillis() - orderResultInfo.getTime() > 3 * 60 * 60 * 1000;
+    }
+
+    @JsonIgnore
     public boolean isOlderThanLast12Hours() {
         return System.currentTimeMillis() - orderResultInfo.getTime() > 12 * 60 * 60 * 1000;
     }
 
     @JsonIgnore
+    public boolean isOlderThanLastHour() {
+        return System.currentTimeMillis() - orderResultInfo.getTime() > 60 * 60 * 1000;
+    }
+
+    @JsonIgnore
     public boolean isSuccessful() {
         return orderResultInfo.getRetCode() == 0 && orderResultInfo.getRetMsg().equalsIgnoreCase("OK");
+    }
+
+    @JsonIgnore
+    public boolean isClosedByStopLoss() {
+        return closed && stopOrderType == StopOrderType.STOP_LOSS;
+    }
+
+    @JsonIgnore
+    public Symbol getSymbol() {
+        return orderResultInfo.getSymbol();
     }
 
 }

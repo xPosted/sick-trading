@@ -3,9 +3,11 @@ package com.crypto.sick.trade.data.user;
 import com.bybit.api.client.domain.CategoryType;
 import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.dto.enums.TaapiIntervalEnum;
-import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

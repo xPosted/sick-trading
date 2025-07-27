@@ -1,6 +1,5 @@
 package com.crypto.sick.trade.dto.web.bybit;
 
-import com.bybit.api.client.domain.market.response.tickers.TickersResult;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

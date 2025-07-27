@@ -1,6 +1,5 @@
 package com.crypto.sick.trade.service.action;
 
-import com.bybit.api.client.domain.trade.Side;
 import com.crypto.sick.trade.data.user.CoinIntervalTradingState;
 import com.crypto.sick.trade.data.user.CredentialsState;
 import com.crypto.sick.trade.data.user.FlowState;

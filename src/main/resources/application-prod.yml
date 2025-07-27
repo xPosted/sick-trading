@@ -2,16 +2,18 @@ logging:
   level:
     ROOT: WARN
     com.crypto.sick.trade: INFO
+    com.bybit.api.client.websocket.impl: OFF
 
 server:
   port : 8081
 
 schedulers:
-  tradeInterval: 2 #seconds
-  rsiLazyUpdateInterval: 30
-  rsiForceUpdateInterval: 2
+  tradeInterval: 1 #seconds
+  rsiLazyUpdateInterval: 35
+  rsiForceUpdateInterval: 3
   webSocketUpdateInterval: 60
   walletUpdateInterval: 60
+  statusVerifierInterval: 120
 
 # test changes 7
 
@@ -29,32 +31,19 @@ sick-trader.config:
     - INTERVAL_30m
   disableOnStopLoss: true
   users:
-    - name: jubakaDemo
-      enabled: true
+    - name: jubakaDemo # High stop loss values & high take profit values & sync strategy for take profit flow
+      status: ENABLED
       trade:
         linear:
-          #          COOKIEUSDT:
-          #            INTERVAL_30m:
-          #              buyAmount: 7 # $
-          #              leverage: 1
-          #              flows:
-          #                CHAIN_FLOW: &30M_CHAIN_FLOW_TEMPLATE
-          #                  syncStrategies: true
-          #                  stopLoss: 1.9  # %
-          #                  takeProfit: 1.3 # %
-          #                  strategies:
-          #                    CHAIN_STRATEGY:
-          #                      type: CHAIN_STRATEGY
-          #                      priceOffset: 0.1  # %
           LTCUSDT:
             INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1
               buyAmount: 200 # $
               leverage: 4
-              flows: &30M_FLOWS_TEMPLATE_VOLATILE_1
-                MAIN_FLOW: &30M_MAIN_FLOW_TEMPLATE_VOLATILE_1
+              flows:
+                MAIN_FLOW:
                   syncStrategies: true
-                  stopLoss: 2.8  # %
-                  takeProfit: 4.5 # %
+                  stopLoss: 7  # %
+                  takeProfit: 5 # %
                   strategies:
                     RSI_STRATEGY:
                       type: RSI_STRATEGY
@@ -70,38 +59,42 @@ sick-trader.config:
                       stopLossTimeout: 360
                       highCriticalValue: 80
                       lowCriticalValue: 20
-                TAKE_PROFIT_FLOW: &30M_TAKE_PROFIT_FLOW_TEMPLATE_VOLATILE_1
-                  syncStrategies: false
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: true
                   strategies:
                     RSI_STRATEGY:
                       type: RSI_STRATEGY
                       priceOffset: 0.3  # %
                       indicatorOffset: 2
                       stopLossTimeout: 360
-                      highCriticalValue: 58
-                      lowCriticalValue: 42
+                      highCriticalValue: 63
+                      lowCriticalValue: 37
                     MFI_STRATEGY:
                       type: MFI_STRATEGY
                       priceOffset: 0.3  # %
                       indicatorOffset: 3
                       stopLossTimeout: 360
-                      highCriticalValue: 69
-                      lowCriticalValue: 31
-                OVERTAKE_FLOW: &30M_OVERTAKE_FLOW_TEMPLATE_VOLATILE_1
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                HEDGE_FLOW:
                   syncStrategies: false
+                  stopLoss: 0.6  # %
+                  takeProfit: 1.2 # %
                   strategies:
-                    OVERTAKE_STRATEGY:
-                      type: OVERTAKE_STRATEGY
-                      priceOffset: 1  # %
+                    HEDGE_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.6  # %
           XRPUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
+          ETHUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
+          BTCUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
           SOLUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
           TRXUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
           BNBUSDT:
-            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
-          SUIUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
           ADAUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1
@@ -109,19 +102,19 @@ sick-trader.config:
             INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2
               buyAmount: 200 # $
               leverage: 4
-              flows: &30M_FLOWS_TEMPLATE_VOLATILE_2
+              flows:
                 MAIN_FLOW:
                   syncStrategies: true
-                  stopLoss: 3.5  # %
-                  takeProfit: 5.5 # %
+                  stopLoss: 9  # %
+                  takeProfit: 6.5 # %
                   strategies:
                     RSI_STRATEGY:
                       type: RSI_STRATEGY
                       priceOffset: 0.7  # %
                       indicatorOffset: 3
                       stopLossTimeout: 360
-                      highCriticalValue: 71
-                      lowCriticalValue: 29
+                      highCriticalValue: 72
+                      lowCriticalValue: 28
                     MFI_STRATEGY:
                       type: MFI_STRATEGY
                       priceOffset: 0.7
@@ -129,29 +122,33 @@ sick-trader.config:
                       stopLossTimeout: 360
                       highCriticalValue: 81.5
                       lowCriticalValue: 18.5
-                TAKE_PROFIT_FLOW: &30M_TAKE_PROFIT_FLOW_TEMPLATE_VOLATILE_2
-                  syncStrategies: false
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: true
                   strategies:
                     RSI_STRATEGY:
                       type: RSI_STRATEGY
                       priceOffset: 0.3  # %
                       indicatorOffset: 2
                       stopLossTimeout: 360
-                      highCriticalValue: 58
-                      lowCriticalValue: 42
+                      highCriticalValue: 63
+                      lowCriticalValue: 37
                     MFI_STRATEGY:
                       type: MFI_STRATEGY
                       priceOffset: 0.3  # %
                       indicatorOffset: 3
                       stopLossTimeout: 360
-                      highCriticalValue: 69
-                      lowCriticalValue: 31
-                OVERTAKE_FLOW:
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                HEDGE_FLOW:
                   syncStrategies: false
+                  stopLoss: 0.6  # %
+                  takeProfit: 1.2 # %
                   strategies:
-                    OVERTAKE_STRATEGY:
-                      type: OVERTAKE_STRATEGY
-                      priceOffset: 1.4  # %
+                    HEDGE_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.6  # %
+          SUIUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
           AAVEUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
           HBARUSDT:
@@ -160,21 +157,21 @@ sick-trader.config:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
           VIRTUALUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
-          UNIUSDT:
+          ENAUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2
-    - name: jubaka
-      enabled: true
+    - name: jubaka-obiTwo-demo  # High stop loss values & high take profit values
+      status: ENABLED
       trade:
         linear:
           LTCUSDT:
-            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
-              buyAmount: 60 # $
-              leverage: 5
-              flows: &30M_FLOWS_TEMPLATE_VOLATILE_1
-                MAIN_FLOW: &30M_MAIN_FLOW_TEMPLATE_VOLATILE_1
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1_OBITWO
+              buyAmount: 200 # $
+              leverage: 4
+              flows:
+                MAIN_FLOW:
                   syncStrategies: true
-                  stopLoss: 2.8  # %
-                  takeProfit: 4.5 # %
+                  stopLoss: 7  # %
+                  takeProfit: 5 # %
                   strategies:
                     RSI_STRATEGY:
                       type: RSI_STRATEGY
@@ -190,7 +187,7 @@ sick-trader.config:
                       stopLossTimeout: 360
                       highCriticalValue: 80
                       lowCriticalValue: 20
-                TAKE_PROFIT_FLOW: &30M_TAKE_PROFIT_FLOW_TEMPLATE_VOLATILE_1
+                TAKE_PROFIT_FLOW:
                   syncStrategies: false
                   strategies:
                     RSI_STRATEGY:
@@ -198,50 +195,46 @@ sick-trader.config:
                       priceOffset: 0.3  # %
                       indicatorOffset: 2
                       stopLossTimeout: 360
-                      highCriticalValue: 58
-                      lowCriticalValue: 42
+                      highCriticalValue: 64
+                      lowCriticalValue: 36
                     MFI_STRATEGY:
                       type: MFI_STRATEGY
                       priceOffset: 0.3  # %
                       indicatorOffset: 3
                       stopLossTimeout: 360
-                      highCriticalValue: 69
-                      lowCriticalValue: 31
-                OVERTAKE_FLOW: &30M_OVERTAKE_FLOW_TEMPLATE_VOLATILE_1
-                  syncStrategies: false
-                  strategies:
-                    OVERTAKE_STRATEGY:
-                      type: OVERTAKE_STRATEGY
-                      priceOffset: 1  # %
+                      highCriticalValue: 73
+                      lowCriticalValue: 27
           XRPUSDT:
-            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBITWO
+          ETHUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBITWO
+          BTCUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBITWO
           SOLUSDT:
-            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBITWO
           TRXUSDT:
-            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBITWO
           BNBUSDT:
-            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
-          SUIUSDT:
-            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBITWO
           ADAUSDT:
-            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBITWO
           AVAXUSDT:
-            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
-              buyAmount: 60 # $
-              leverage: 5
-              flows: &30M_FLOWS_TEMPLATE_VOLATILE_2
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2_OBITWO
+              buyAmount: 200 # $
+              leverage: 4
+              flows:
                 MAIN_FLOW:
                   syncStrategies: true
-                  stopLoss: 3.5  # %
-                  takeProfit: 5.5 # %
+                  stopLoss: 9  # %
+                  takeProfit: 6.5 # %
                   strategies:
                     RSI_STRATEGY:
                       type: RSI_STRATEGY
                       priceOffset: 0.7  # %
                       indicatorOffset: 3
                       stopLossTimeout: 360
-                      highCriticalValue: 71
-                      lowCriticalValue: 29
+                      highCriticalValue: 72
+                      lowCriticalValue: 28
                     MFI_STRATEGY:
                       type: MFI_STRATEGY
                       priceOffset: 0.7
@@ -249,7 +242,7 @@ sick-trader.config:
                       stopLossTimeout: 360
                       highCriticalValue: 81.5
                       lowCriticalValue: 18.5
-                TAKE_PROFIT_FLOW: &30M_TAKE_PROFIT_FLOW_TEMPLATE_VOLATILE_2
+                TAKE_PROFIT_FLOW:
                   syncStrategies: false
                   strategies:
                     RSI_STRATEGY:
@@ -257,21 +250,392 @@ sick-trader.config:
                       priceOffset: 0.3  # %
                       indicatorOffset: 2
                       stopLossTimeout: 360
-                      highCriticalValue: 58
-                      lowCriticalValue: 42
+                      highCriticalValue: 64
+                      lowCriticalValue: 36
                     MFI_STRATEGY:
                       type: MFI_STRATEGY
                       priceOffset: 0.3  # %
                       indicatorOffset: 3
                       stopLossTimeout: 360
-                      highCriticalValue: 69
-                      lowCriticalValue: 31
-                OVERTAKE_FLOW:
+                      highCriticalValue: 73
+                      lowCriticalValue: 27
+          SUIUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBITWO
+          AAVEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBITWO
+          HBARUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBITWO
+          DOGEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBITWO
+          VIRTUALUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBITWO
+          ENAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBITWO
+    - name: jubaka-obiOne-demo # Low stop loss values & low take profit values
+      status: DISABLED
+      trade:
+        linear:
+          LTCUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIONE
+              buyAmount: 200 # $
+              leverage: 4
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 1.1  # %
+                  takeProfit: 1.1 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.4  # %  Also low value
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.4  # %  Also low value
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 80
+                      lowCriticalValue: 20
+                TAKE_PROFIT_FLOW:
                   syncStrategies: false
                   strategies:
-                    OVERTAKE_STRATEGY:
-                      type: OVERTAKE_STRATEGY
-                      priceOffset: 1.4  # %
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 64
+                      lowCriticalValue: 36
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 73
+                      lowCriticalValue: 27
+          XRPUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIONE
+          ETHUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIONE
+          BTCUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIONE
+          SOLUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIONE
+          TRXUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIONE
+          BNBUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIONE
+          ADAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIONE
+          AVAXUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIONE
+              buyAmount: 200 # $
+              leverage: 4
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 1.3  # %
+                  takeProfit: 1.3 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.5  # %  Also low value
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 72
+                      lowCriticalValue: 28
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.5 # %  Also low value
+                      indicatorOffset: 4
+                      stopLossTimeout: 360
+                      highCriticalValue: 81.5
+                      lowCriticalValue: 18.5
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: false
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 64
+                      lowCriticalValue: 36
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 73
+                      lowCriticalValue: 27
+          SUIUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIONE
+          AAVEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIONE
+          HBARUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIONE
+          DOGEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIONE
+          VIRTUALUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIONE
+          ENAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIONE
+    - name: jubaka-obiZero-demo # Very low stop loss values & low take profit values
+      status: DISABLED
+      trade:
+        linear:
+          LTCUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIZERO
+              buyAmount: 200 # $
+              leverage: 4
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 0.6  # %
+                  takeProfit: 0.6 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.4  # %  Also low value
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.4  # %  Also low value
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 80
+                      lowCriticalValue: 20
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: false
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 64
+                      lowCriticalValue: 36
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 73
+                      lowCriticalValue: 27
+          XRPUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIZERO
+          ETHUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIZERO
+          BTCUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIZERO
+          SOLUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIZERO
+          TRXUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIZERO
+          BNBUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIZERO
+          ADAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_OBIZERO
+          AVAXUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIZERO
+              buyAmount: 200 # $
+              leverage: 4
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 0.8  # %
+                  takeProfit: 0.8 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.5  # %  Also low value
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 72
+                      lowCriticalValue: 28
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.5 # %  Also low value
+                      indicatorOffset: 4
+                      stopLossTimeout: 360
+                      highCriticalValue: 81.5
+                      lowCriticalValue: 18.5
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: false
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 64
+                      lowCriticalValue: 36
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 73
+                      lowCriticalValue: 27
+          SUIUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIZERO
+          AAVEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIZERO
+          HBARUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIZERO
+          DOGEUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIZERO
+          VIRTUALUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIZERO
+          ENAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_OBIZERO
+    - name: jubaka  # High stop loss values & high take profit values - PRODUCTION
+      status: DISABLED
+      trade:
+        linear:
+          TRXUSDT: # Move to volatile 0
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_0_PROD
+              buyAmount: 105 # $
+              leverage: 9
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 7  # %
+                  takeProfit: 5 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.4  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 69.5
+                      lowCriticalValue: 30.5
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.4
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 79
+                      lowCriticalValue: 21
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: false
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.2  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 64
+                      lowCriticalValue: 36
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.2  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 73
+                      lowCriticalValue: 27
+          BNBUSDT: # Move to volatile 0
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_0_PROD
+          LTCUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+              buyAmount: 105 # $
+              leverage: 9
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 7  # %
+                  takeProfit: 5 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.5  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 70
+                      lowCriticalValue: 30
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.5
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 80
+                      lowCriticalValue: 20
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: false
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 64
+                      lowCriticalValue: 36
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 73
+                      lowCriticalValue: 27
+          XRPUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          ETHUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          BTCUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          SOLUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          ADAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_PROD
+          AVAXUSDT:
+            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
+              buyAmount: 105 # $
+              leverage: 9
+              flows:
+                MAIN_FLOW:
+                  syncStrategies: true
+                  stopLoss: 9  # %
+                  takeProfit: 6.5 # %
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.6  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 72
+                      lowCriticalValue: 28
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.6
+                      indicatorOffset: 4
+                      stopLossTimeout: 360
+                      highCriticalValue: 81.5
+                      lowCriticalValue: 18.5
+                TAKE_PROFIT_FLOW:
+                  syncStrategies: false
+                  strategies:
+                    RSI_STRATEGY:
+                      type: RSI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 2
+                      stopLossTimeout: 360
+                      highCriticalValue: 64
+                      lowCriticalValue: 36
+                    MFI_STRATEGY:
+                      type: MFI_STRATEGY
+                      priceOffset: 0.3  # %
+                      indicatorOffset: 3
+                      stopLossTimeout: 360
+                      highCriticalValue: 73
+                      lowCriticalValue: 27
+          SUIUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
           AAVEUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
           HBARUSDT:
@@ -280,5 +644,36 @@ sick-trader.config:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
           VIRTUALUSDT:
             INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
-
+          ENAUSDT:
+            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_PROD
+#    - name: trader-igor
+#      status: DISABLED
+#      trade:
+#        linear:
+#          XRPUSDT:
+#            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+#              buyAmount: 8 # $
+#              leverage: 4
+#              flows: *30M_FLOWS_TEMPLATE_VOLATILE_1
+#          LTCUSDT:
+#            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+#          SOLUSDT:
+#            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+#          TRXUSDT:
+#            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+#          BNBUSDT:
+#            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+#          ADAUSDT:
+#            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_1_IGOR
+#          AVAXUSDT:
+#            INTERVAL_30m: &30M_INTERVAL_TEMPLATE_VOLATILE_2_IGOR
+#              buyAmount: 8 # $
+#              leverage: 4
+#              flows: *30M_FLOWS_TEMPLATE_VOLATILE_2
+#          AAVEUSDT:
+#            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_IGOR
+#          HBARUSDT:
+#            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_IGOR
+#          DOGEUSDT:
+#            INTERVAL_30m: *30M_INTERVAL_TEMPLATE_VOLATILE_2_IGOR
   debug-mode: false

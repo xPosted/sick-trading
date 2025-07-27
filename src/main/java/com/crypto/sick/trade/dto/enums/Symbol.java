@@ -49,7 +49,9 @@ public enum Symbol {
     BANKUSDT("BANKUSDT", 0,0),
     HAEDALUSDT("HAEDALUSDT", 0,0),
     SYRUPUSDT("SYRUPUSDT", 0,0),
-    UNIUSDT("UNIUSDT", 1,1);
+    UNIUSDT("UNIUSDT", 1,1),
+    WIFUSDT("WIFUSDT", 0,0),
+    ENAUSDT("ENAUSDT", 0,0);
 
 
 

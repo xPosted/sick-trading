@@ -5,8 +5,10 @@ import com.bybit.api.client.domain.trade.Side;
 import com.bybit.api.client.domain.trade.response.OrderResponse;
 import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.dto.web.bybit.PlaceOrderResponse;
-import lombok.*;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder

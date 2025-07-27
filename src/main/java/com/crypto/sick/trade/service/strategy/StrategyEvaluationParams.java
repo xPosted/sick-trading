@@ -8,8 +8,7 @@ import com.crypto.sick.trade.dto.enums.TaapiIntervalEnum;
 import lombok.Builder;
 import lombok.Value;
 
-import javax.enterprise.inject.spi.Producer;
-import java.util.Optional;
+import java.util.List;
 import java.util.function.Function;
 
 @Value
@@ -24,6 +23,6 @@ public class StrategyEvaluationParams {
     Function<Double, Boolean> isAvailableToBuy;
     Double takeProfit;
     Double stopLoss;
-    Optional<OrderContext> lastOrder;
+    List<OrderContext> lastOrders;
 
 }

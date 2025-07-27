@@ -9,7 +9,6 @@ import software.amazon.awssdk.enhanced.dynamodb.AttributeValueType;
 import software.amazon.awssdk.enhanced.dynamodb.EnhancedType;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
-import javax.persistence.Converter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

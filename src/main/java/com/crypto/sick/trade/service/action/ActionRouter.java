@@ -1,10 +1,7 @@
 package com.crypto.sick.trade.service.action;
 
-import com.bybit.api.client.domain.CategoryType;
 import com.crypto.sick.trade.data.user.CoinIntervalTradingState;
 import com.crypto.sick.trade.data.user.CredentialsState;
-import com.crypto.sick.trade.dto.enums.Symbol;
-import com.crypto.sick.trade.service.strategy.StrategyEvaluationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
