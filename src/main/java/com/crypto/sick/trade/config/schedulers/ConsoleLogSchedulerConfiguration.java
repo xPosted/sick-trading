@@ -53,21 +53,23 @@ public class ConsoleLogSchedulerConfiguration {
         log.info("------------  ------------");
         log.info("------------ User Flow States ------------");
 
-        userService.findAll().forEach(userState -> {
-            log.info("User: {}", userState.getName());
-            userState.getCategoryTradingStates().forEach((category, categoryTradingState) -> {
-                log.info("\tCategory: {}", category);
-                categoryTradingState.getCoinTradingStates().forEach((symbol, coinTradingState) -> {
-                    log.info("\t\tSymbol: {}", symbol);
-                    coinTradingState.getIntervalStates().forEach((interval, state) -> {
-                        log.info("\t\t\t {}", interval);
-                        state.getFlowStates().values().forEach(flowState -> {
-                            log.info("\t\t\t\t{}", flowState);
+        userService.findAll()
+                .filter(UserStateEntity::isEnabled)
+                .forEach(userState -> {
+                    log.info("User: {}", userState.getName());
+                    userState.getCategoryTradingStates().forEach((category, categoryTradingState) -> {
+                        log.info("\tCategory: {}", category);
+                        categoryTradingState.getCoinTradingStates().forEach((symbol, coinTradingState) -> {
+                            log.info("\t\tSymbol: {}", symbol);
+                            coinTradingState.getIntervalStates().forEach((interval, state) -> {
+                                log.info("\t\t\t {}", interval);
+                                state.getFlowStates().values().forEach(flowState -> {
+                                    log.info("\t\t\t\t{}", flowState);
+                                });
+                            });
                         });
                     });
                 });
-            });
-        });
 
         log.info("------------  ------------");
         log.info("------------ Market Analytics ------------");

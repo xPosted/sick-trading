@@ -57,17 +57,9 @@ public class HedgeStrategy implements TradingStrategy{
                 .filter(order -> order.getFlowType().equals(FlowTypeEnum.HEDGE_FLOW))
                 .findAny();
 
-        if (hedgeFlowLastOrder
-                .filter(order -> ! order.isOlderThanLast3Hours())
-                .isPresent())
-        {
-            return StrategyEvaluationResult.builder()
-                    .strategy(strategyName)
-                    .tradingStatus(TradingStrategyStatusEnum.SLEEPING)
-                    .build();
-        }
         return mainFlowLastOrder
-                .filter(orderContext -> ! orderContext.isOlderThanLast3Hours())
+     //           .filter(orderContext -> ! orderContext.isOlderThanLast3Hours())
+                .filter(mainOrder -> hedgeFlowLastOrder.isEmpty() || hedgeFlowLastOrder.filter(mainOrder::isBefore).isEmpty())
                 .map(orderContext -> {
                     switch (orderContext.getSide()) {
                         case BUY -> {

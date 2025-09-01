@@ -6,6 +6,7 @@ import com.crypto.sick.trade.data.user.CoinIntervalTradingState;
 import com.crypto.sick.trade.data.user.CredentialsState;
 import com.crypto.sick.trade.data.user.FlowState;
 import com.crypto.sick.trade.dto.enums.FlowTypeEnum;
+import com.crypto.sick.trade.dto.enums.Symbol;
 import com.crypto.sick.trade.dto.enums.TradingStrategyStatusEnum;
 import com.crypto.sick.trade.service.MarketRepository;
 import com.crypto.sick.trade.service.TradeOperationService;
@@ -52,7 +53,7 @@ public class LinearHedgeActionProcessor implements TradeAction {
     private CoinIntervalTradingState buyAction(CoinIntervalTradingState coinTradingState, FlowState flowState, CredentialsState credentials) {
         var symbol = coinTradingState.getSymbol();
         var targetMarketState = marketRepository.getMarketState(symbol);
-        if (validateExistentOrders(credentials, Side.BUY)) {
+        if (validateExistentOrdersBySymbol(credentials, symbol, Side.BUY)) {
             var operationContext = new TradeOperationService.OperationContext(coinTradingState, flowState, credentials, targetMarketState);
             var orderContext = tradeOperationService.makeLongOperation(operationContext);
             return coinTradingState.forceStatus(flowType, TradingStrategyStatusEnum.SLEEPING, orderContext);
@@ -63,7 +64,7 @@ public class LinearHedgeActionProcessor implements TradeAction {
     private CoinIntervalTradingState sellAction(CoinIntervalTradingState coinTradingState, FlowState flowState, CredentialsState credentials) {
         var symbol = coinTradingState.getSymbol();
         var targetMarketState = marketRepository.getMarketState(symbol);
-        if (validateExistentOrders(credentials, Side.SELL)) {
+        if (validateExistentOrdersBySymbol(credentials, symbol, Side.SELL)) {
             var operationContext = new TradeOperationService.OperationContext(coinTradingState, flowState, credentials, targetMarketState);
             var orderContext = tradeOperationService.makeShortOperation(operationContext);
             return coinTradingState.forceStatus(flowType, TradingStrategyStatusEnum.SLEEPING, orderContext);
@@ -71,7 +72,21 @@ public class LinearHedgeActionProcessor implements TradeAction {
         return coinTradingState;
     }
 
-    private boolean validateExistentOrders(CredentialsState credentials, Side side) {
+    private boolean validateExistentOrdersBySymbol(CredentialsState credentials, Symbol symbol, Side side) {
+        switch (side) {
+            case BUY -> {
+                var positions = tradeOperationService.getOpenPositions(credentials, CategoryType.LINEAR, symbol, Side.BUY);
+                return positions.isEmpty();
+            }
+            case SELL -> {
+                var positions = tradeOperationService.getOpenPositions(credentials, CategoryType.LINEAR, symbol, Side.SELL);
+                return positions.isEmpty();
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + side);
+        }
+    }
+
+    private boolean validateExistentOrdersOnMaxPositionsCount(CredentialsState credentials, Side side) {
         switch (side) {
             case BUY -> {
                 var positions = tradeOperationService.getOpenPositions(credentials, CategoryType.LINEAR, null, Side.BUY);

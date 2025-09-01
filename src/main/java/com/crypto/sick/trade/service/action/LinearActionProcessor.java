@@ -51,25 +51,27 @@ public class LinearActionProcessor implements TradeAction {
     private CoinIntervalTradingState buyAction(CoinIntervalTradingState coinTradingState, FlowState flowState, CredentialsState credentials) {
         var symbol = coinTradingState.getSymbol();
         var targetMarketState = marketRepository.getMarketState(symbol);
-        if (validateExistentOrders(credentials, symbol, Side.BUY, targetMarketState.getLastPrice())) {
+        // skipping this check for testing new hedge strategy
+  //      if (validateExistentOrders(credentials, symbol, Side.BUY, targetMarketState.getLastPrice())) {
             var operationContext = new TradeOperationService.OperationContext(coinTradingState, flowState, credentials, targetMarketState);
-            tradeOperationService.makeShortCloseOperation(operationContext);
+  //          tradeOperationService.makeShortCloseOperation(operationContext);
             var orderContext = tradeOperationService.makeLongOperation(operationContext);
             return coinTradingState.forceStatus(flowType, SLEEPING, orderContext);
-        }
-        return coinTradingState.forceStatus(flowType, SLEEPING);
+  //      }
+  //      return coinTradingState.forceStatus(flowType, SLEEPING);
     }
 
     private CoinIntervalTradingState sellAction(CoinIntervalTradingState coinTradingState, FlowState flowState, CredentialsState credentials) {
         var symbol = coinTradingState.getSymbol();
         var targetMarketState = marketRepository.getMarketState(symbol);
-        if (validateExistentOrders(credentials, symbol, Side.SELL, targetMarketState.getLastPrice())) {
+        // skipping this check for testing new hedge strategy
+ //       if (validateExistentOrders(credentials, symbol, Side.SELL, targetMarketState.getLastPrice())) { // skipping this check for now
             var operationContext = new TradeOperationService.OperationContext(coinTradingState, flowState, credentials, targetMarketState);
-            tradeOperationService.makeLongCloseOperation(operationContext);
+ //           tradeOperationService.makeLongCloseOperation(operationContext);
             var orderContext =  tradeOperationService.makeShortOperation(operationContext);
             return coinTradingState.forceStatus(flowType, SLEEPING, orderContext);
-        }
-        return coinTradingState.forceStatus(flowType, SLEEPING);
+ //       }
+ //       return coinTradingState.forceStatus(flowType, SLEEPING);
     }
 
     private CoinIntervalTradingState sleepingAction(CoinIntervalTradingState coinTradingState) {

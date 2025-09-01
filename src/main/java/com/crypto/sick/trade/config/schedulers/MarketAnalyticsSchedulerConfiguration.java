@@ -67,7 +67,7 @@ public class MarketAnalyticsSchedulerConfiguration {
                 .map(MarketState::getSymbol)
                 .filter(this::supportedSymbolsFilter)
                 .toList();
-        taapiService.getBulkIndicators(TaapiExchangeEnum.BYBIT, symbols, appConfig.getSupportedIntervals())
+        taapiService.getBulkIndicators(TaapiExchangeEnum.BINANCE, symbols, appConfig.getSupportedIntervals())
                 .getResults()
                 .entrySet()
                 .forEach(this::updateMarketState);

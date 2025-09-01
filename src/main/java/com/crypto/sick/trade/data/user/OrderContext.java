@@ -103,6 +103,11 @@ public class OrderContext {
     }
 
     @JsonIgnore
+    public boolean isBefore(OrderContext order) {
+        return orderResultInfo.getTime() < order.getOrderResultInfo().getTime();
+    }
+
+    @JsonIgnore
     public boolean isSuccessful() {
         return orderResultInfo.getRetCode() == 0 && orderResultInfo.getRetMsg().equalsIgnoreCase("OK");
     }

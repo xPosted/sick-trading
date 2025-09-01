@@ -150,7 +150,7 @@ public class CoinIntervalTradingState {
             case LINEAR: {
                 return lastOrder.isEmpty() ||
                         lastOrder.filter(OrderContext::isShortOperationType).isPresent() ||
-                        lastOrder.filter(OrderContext::isOlderThanLast3Hours).isPresent();
+                        lastOrder.filter(OrderContext::isOlderThanLast12Hours).isPresent();
             }
             default:
                 throw new IllegalArgumentException("Unknown category: " + category);
@@ -171,7 +171,7 @@ public class CoinIntervalTradingState {
                 var lastOrder = getLastSuccessfulOrderHistoryItem(MAIN_FLOW);
                 return lastOrder.isEmpty() ||
                         lastOrder.filter(OrderContext::isLongOperationType).isPresent() ||
-                        lastOrder.filter(OrderContext::isOlderThanLast3Hours).isPresent();
+                        lastOrder.filter(OrderContext::isOlderThanLast12Hours).isPresent();
             }
             default:
                 throw new IllegalArgumentException("Unknown category: " + category);
