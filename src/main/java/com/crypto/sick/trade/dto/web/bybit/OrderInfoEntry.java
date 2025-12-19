@@ -25,31 +25,31 @@ import java.math.RoundingMode;
 public class OrderInfoEntry {
 
     private String orderId;
-    private String orderLinkId;
-    private String blockTradeId;
+//    private String orderLinkId;
+//    private String blockTradeId;
     private String symbol;
     private String price;
     private String qty;
     private String side;
-    private String isLeverage;
+//    private String isLeverage;
     private OrderStatusEnum orderStatus;
-    private RejectReason rejectReason;
+//    private RejectReason rejectReason;
     private String avgPrice;
-    private String leavesQty;
-    private String leavesValue;
+//    private String leavesQty;
+//    private String leavesValue;
     private double cumExecQty;
-    private String cumExecValue;
+//    private String cumExecValue;
     private double cumExecFee;
-    private TimeInForce timeInForce;
-    private String orderType;
-    private String takeProfit;
-    private String stopLoss;
-    private String tpslMode;
-    private String tpLimitPrice;
-    private String slLimitPrice;
-    private String lastPriceOnCreated;
+//    private TimeInForce timeInForce;
+//    private String orderType;
+//    private String takeProfit;
+//    private String stopLoss;
+//    private String tpslMode;
+//    private String tpLimitPrice;
+//    private String slLimitPrice;
+//    private String lastPriceOnCreated;
     private String createdTime;
-    private String updatedTime;
+//    private String updatedTime;
 
     @JsonIgnore
     public Double getOrderResultQty() {

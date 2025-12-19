@@ -201,8 +201,9 @@ public class TradeOperationService {
                 .map(BigDecimal::toString)
                 .orElse(null);
         var orderResultInfo = orderService.placeMarketOrder2(credentials, LINEAR, symbol, BUY, qty.toString(), "LONG_OPEN_ORDER_" + new Random().nextInt(), takeProfitPrice, stopLossPrice, null, null);
-        var orderInfoResult = orderService.getOrderById(credentials, LINEAR, orderResultInfo.getOrderResponse().getOrderId());
-        return OrderContext.buildOrderContext(flowType, orderResultInfo, orderInfoResult, rsiValue, mfiValue, lastPrice.doubleValue(), LONG_OPERATION);
+        //TODO: this operation should be postponed to async processing
+      //  var orderInfoResult = orderService.getOrderById(credentials, LINEAR, orderResultInfo.getOrderResponse().getOrderId());
+        return OrderContext.buildOrderContext(flowType, orderResultInfo, null, rsiValue, mfiValue, lastPrice.doubleValue(), LONG_OPERATION);
     }
 
     public OrderContext makeLongCloseOperation(OperationContext operationContext) {
